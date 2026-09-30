@@ -4,3 +4,11 @@
 *.db
 .beads-credential-key
 .beads/proxieddb/
+
+# Local infrastructure and owned foundation outputs
+/.beads/
+/worktrees/
+/node_modules/
+/.foundation-build/
+.env
+.env.*
