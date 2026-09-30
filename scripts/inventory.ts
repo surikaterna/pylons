@@ -1,9 +1,22 @@
 import { lstat, readdir, readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { validateContractsManifest } from "./package-policy.js";
-import { FoundationError, rejectRuntimeLinks, validateManifest } from "./policy.js";
+import { FoundationError, record, rejectRuntimeLinks, validateManifest } from "./policy.js";
 
-const excluded = new Set([".git", ".beads", "node_modules", "worktrees", ".foundation-build"]);
+const excluded = new Set([".git", ".beads", "node_modules", "worktrees", ".foundation-build", ".feasibility-build"]);
+const privateManifests = new Map([
+  ["plugins/basic-validation", "pylons-private-basic-validation"],
+  ["apps/web-server", "pylons-private-web-server"],
+  ["apps/browser", "pylons-private-browser"],
+  ["apps/cli", "pylons-private-cli"],
+  ["apps/fixture-server", "pylons-private-fixture-server"],
+]);
+
+function privateManifest(value: unknown, name: string): void {
+  const manifest = record(value);
+  if (Object.keys(manifest).length !== 3 || manifest.name !== name || manifest.private !== true || manifest.type !== "module")
+    throw new FoundationError("Private harness manifest invalid");
+}
 
 async function manifests(root: string, budget: { remaining: number }, contractsRoot: string, depth = 0): Promise<string[]> {
   if (depth > 8) throw new FoundationError("Inventory depth exceeds foundation bound");
@@ -37,7 +50,11 @@ export async function verifyPackages(root: string): Promise<readonly string[]> {
     rejectRuntimeLinks(value);
     if (path === rootManifest) validateManifest(value);
     else if (path === join(directory, "packages/contracts/package.json")) validateContractsManifest(value);
-    else throw new FoundationError("Unexpected package manifest outside approved contracts workspace");
+    else {
+      const expected = [...privateManifests].find(([privateDirectory]) => path === join(directory, privateDirectory, "package.json"));
+      if (!expected) throw new FoundationError("Unexpected package manifest outside approved contracts workspace");
+      privateManifest(value, expected[1]);
+    }
   }
   if (!paths.includes(rootManifest)) throw new FoundationError("Missing private root manifest");
   return paths;

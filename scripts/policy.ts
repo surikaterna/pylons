@@ -7,16 +7,30 @@ export const foundationManifest = Object.freeze({
   private: true,
   type: "module",
   packageManager: "bun@1.4.2",
-  workspaces: Object.freeze(["packages/contracts"]),
+  workspaces: Object.freeze(["packages/contracts", "plugins/basic-validation", "apps/web-server", "apps/browser", "apps/cli", "apps/fixture-server"]),
   scripts: Object.freeze({
-    lint: "biome check scripts tests packages/contracts/src packages/contracts/test && bun scripts/check.ts . && bun scripts/check-provenance.ts",
-    typecheck: "bun node_modules/typescript/bin/tsc --project tsconfig.json && bun node_modules/typescript/bin/tsc --project packages/contracts/tsconfig.json",
+    lint: "biome check scripts tests apps plugins/basic-validation/src packages/contracts/src packages/contracts/test && bun scripts/check.ts . && bun scripts/check-provenance.ts",
+    typecheck:
+      "bun node_modules/typescript/bin/tsc --project packages/contracts/tsconfig.build.json && bun node_modules/typescript/bin/tsc --project tsconfig.json && bun node_modules/typescript/bin/tsc --project packages/contracts/tsconfig.json",
     test: "bun test tests packages/contracts/test",
-    build: "bun scripts/build.ts",
-    "test:e2e": "bun scripts/e2e.ts",
+    build: "bun scripts/build.ts && bun run build:feasibility",
+    "test:e2e": "bun scripts/e2e.ts && bun run test:feasibility:e2e",
     "verify:packages": "bun scripts/verify-packages.ts",
+    "build:feasibility": "bun scripts/feasibility-build.ts",
+    "test:feasibility": "bun test tests/feasibility",
+    "test:feasibility:e2e": "bun scripts/feasibility-e2e.ts",
   }),
   devDependencies: Object.freeze({
+    "@pylons/contracts": "workspace:*",
+    "@types/debug": "4.1.12",
+    "@module-federation/enhanced": "2.9.0",
+    "@module-federation/runtime": "2.9.0",
+    "@module-federation/sdk": "2.9.0",
+    webpack: "5.106.2",
+    slf: "2.1.0",
+    "slf-debug": "0.3.2",
+    debug: "4.4.3",
+    "playwright-core": "1.63.0",
     "@changesets/cli": "2.29.7",
     "@biomejs/biome": "2.4.13",
     "@types/bun": "1.4.0",
@@ -55,8 +69,8 @@ export function validateManifest(value: unknown): void {
   if (!sameFields(manifest.devDependencies, foundationManifest.devDependencies)) {
     throw new FoundationError("Foundation dependencies must use exact approved pins");
   }
-  if (!Array.isArray(manifest.workspaces) || manifest.workspaces.length !== 1 || manifest.workspaces[0] !== "packages/contracts") {
-    throw new FoundationError("Only the contracts workspace is approved");
+  if (JSON.stringify(manifest.workspaces) !== JSON.stringify(foundationManifest.workspaces)) {
+    throw new FoundationError("Only exact approved workspaces are allowed");
   }
 }
 

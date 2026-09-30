@@ -114,3 +114,24 @@ closure. No ambient/DOM shim or skipLibCheck weakening. Installed Zod includes o
 subpaths, but only the selected v3 runtime/declarations participate in the facade.
 Changesets CLI2.29.7 is exact-pinned development-only; the initial minor changeset
 targets the new public package, which remains unpublished0.0.0. No version/publish run.
+
+## Private early feasibility (.3)
+
+Canonical armada-0wq76.3, approved Builder gate
+`01a0f425-c61e-78e2-b72c-34854b2095cb`, tracks verified/pushed .2 at exact
+`473c9cc8285e826014811727cfc021c0eec955d9`. From its clean contracts worktree,
+bd created `/home/sprawl/projects/pylons/worktrees/feasibility`, branch
+`feature/pylons-feasibility`, and the returned HEAD matched that exact remote branch.
+Root/worktree Beads/common-Git identities match the previously proven target
+identity and differ from Ghost, including the same approved false-flag exception.
+
+New private plugin, host/fixture apps, build/graph/e2e scripts and tests/feasibility
+are original owned source, not copied Ghost runtime implementations. Source
+documentation6169eb2/runtime146f733 and the uncommitted plan/handoff retain their roles
+above; the logging ARB informed the private compatibility adapter and probes.
+Public contracts source/manifests and its existing minor changeset are unchanged;
+its internal tsconfig explicitly retains ES2022-only lib as private tooling gains DOM.
+No third-party source patches, public adapter package, registry operation, Ghost
+edit/adoption, PR/merge or .4-.9 implementation. See feasibility.md for actual
+versions, generated targets/hashes, validation boundaries and logger quirks.
+Independent audit still precedes substantive source commit/push.

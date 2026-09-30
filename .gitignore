@@ -14,3 +14,4 @@
 /packages/contracts/node_modules/
 .env
 .env.*
+.feasibility-build/

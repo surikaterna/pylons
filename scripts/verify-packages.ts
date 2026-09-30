@@ -70,7 +70,7 @@ async function consumer(root: string, temp: string, tarball: string): Promise<vo
 await main(async () => {
   const root = process.cwd();
   const paths = await verifyPackages(root);
-  if (paths.length !== 2) throw new FoundationError("Actual contracts manifest required");
+  if (!paths.includes(join(root, "packages/contracts/package.json"))) throw new FoundationError("Actual contracts manifest required");
   if (!(await lstat("/tmp/opencode")).isDirectory()) throw new FoundationError("Verified temporary parent required");
   const temp = await mkdtemp("/tmp/opencode/pylons-contracts-pack-");
   try {

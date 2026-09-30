@@ -1,5 +1,14 @@
 # Tooling and contracts validation (.2)
 
+The private .3 extension is documented in [feasibility](feasibility.md). Root
+build/test:e2e now aggregate its real MF/three-host gates, lint/typecheck include
+all private source, and unit discovery includes tests/feasibility. Exact private
+workspace manifests are allowlisted individually; contracts remains the sole
+public package. Public contracts source/manifests and packed no-DOM consumers are
+unchanged; internal contracts tsconfig explicitly pins its existing ES2022-only lib,
+and root typecheck emits those strict declarations before workspace consumption.
+The historical .2 table below records that stage, not current counts.
+
 Run in the contracts worktree with Bun **1.4.2**. TypeScript **5.9.3**, Biome
 **2.4.13**, @types/bun **1.4.0**, development Changesets CLI **2.29.7** and the sole
 package runtime dependency Zod **3.25.76** are exact-pinned in manifests/bun.lock.
