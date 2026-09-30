@@ -10,5 +10,7 @@
 /worktrees/
 /node_modules/
 /.foundation-build/
+/packages/contracts/dist/
+/packages/contracts/node_modules/
 .env
 .env.*

@@ -82,5 +82,35 @@ were committed. Hooks are not bypassed; no Dolt/Git synchronization is claimed.
 Root worktree creation introduced no hidden ignore delta because /worktrees/
 was already reserved. Generated infrastructure remains as approved, not runtime code.
 
-No changeset: root is private/nonpublishable, and reserved paths have no manifests.
-The next .2 issue remains separate; future publishable changes need reviewed changesets.
+No changeset in .1: root was private/nonpublishable, and reserved paths had no manifests.
+
+## Contracts stage (.2)
+
+Canonical armada-0wq76.2 begins from verified/pushed foundation
+`50214bf41420e56f38264194ab3446443fde1254`. Builder gate
+`01a0f3da-6764-77d5-ad1a-06b832610eea` preserves the logical prerequisite using tracks
+for the stacked unmerged sequence. Implementation worktree is
+`/home/sprawl/projects/pylons/worktrees/contracts`, branch `feature/pylons-contracts`,
+created with bd from foundation; shared target Beads identity is unchanged.
+No source commit/push before independent Auditor; no Ghost adoption or later issue start.
+
+Runtime source revision `146f7336a3e70412e764c07e566edcbf54803836`, exact source paths
+`packages/plugin-contracts/src/disposable.ts` and `event.ts`: selectively adapt sync
+cleanup/subscription shapes into `packages/contracts/src/{disposable,event}.ts`, remove
+emitter/interface commentary and add a separate neutral cancellation port. No whole-file
+move or source deletion. `types.ts`, `schemas.ts`, `parsing.ts` in that same source
+directory and `packages/plugin-contracts/test/parse-plugin-contract.test.mjs` inform
+the rewritten inferred schemas/safe results/tests, not copied implementation. See
+[contracts](contracts.md) for the explicit source-test mapping and semantic divergences.
+Documentation inputs retain the exact SHA and local plan/handoff distinction above;
+previous proposal restoration hashes/transforms remain intact.
+
+Owned Ghost-origin adaptations/new source retain MIT Copyright (c) Surikaterna,
+including package LICENSE. Zod is unmodified third-party MIT by Colin McDonnell;
+dependency terms are retained independently, not relicensed as Surikaterna source.
+Builder schema decision `01a0f3ed-1422-71e1-9565-2ef0bb5276e2` expressly replaces the
+observed source Zod4.5.4 pin with exact Zod3.25.76 via zod/v3 for neutral declaration
+closure. No ambient/DOM shim or skipLibCheck weakening. Installed Zod includes other
+subpaths, but only the selected v3 runtime/declarations participate in the facade.
+Changesets CLI2.29.7 is exact-pinned development-only; the initial minor changeset
+targets the new public package, which remains unpublished0.0.0. No version/publish run.

@@ -1,20 +1,23 @@
-# Pylons foundation
+# Pylons
 
-Private stage **armada-0wq76.1**, not an @pylons 0.1.0 runtime release.
-Only pinned tooling and attributed proposed specifications exist here. No contracts,
-core, transport, loader, executable plugins, browser or demo have been implemented.
+Private root workspace with one public-package surface: **@pylons/contracts**, still
+unpublished **0.0.0**, implemented for **armada-0wq76.2** on the verified foundation.
+It contains strict data parsers and neutral injected lifecycle/adapter interfaces,
+not a core runtime, transport, loader, executable plugin, browser or complete demo.
 
 Use `mise trust`, `mise install`, then `bun install --frozen-lockfile`.
-Run the real foundation gates described in [validation](docs/validation.md).
+Run the real tooling/contracts gates described in [validation](docs/validation.md).
+See [contracts API](docs/contracts.md) for schema ownership and intentional legacy divergences.
 [Provenance](docs/provenance.md) records source paths, revisions, transformations,
 license authority and setup exceptions. [Instructions](AGENTS.md) retain canonical
 Ghost Beads issue IDs; the target database only supports local worktree infrastructure.
 
-Reserved directories contain responsibility READMEs, not dummy runtime packages.
+Other reserved directories contain responsibility READMEs, not dummy runtime packages.
 Future graph: contracts ← core; contracts ← independently installed HTTP source
 and MF loader; private host applications compose the chosen adapters.
 MF/slf feasibility, three-host/two-tenant execution, finite trust/validity policy,
-packed consumers and registry publication are **unproven future gates**.
+registry publication are **unproven future gates**. `verify:packages` packs an actual
+Bun tarball and executes clean local ESM/no-DOM type consumers; that is not registry proof.
 
 Proposals: [PRD](docs/architecture/plugin-runtime-0.1-prd.md),
 [ARB](docs/architecture/plugin-runtime-0.1-arb.md),

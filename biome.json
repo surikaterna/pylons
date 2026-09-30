@@ -1,6 +1,6 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
-  "files": { "includes": ["scripts/**/*.ts", "tests/**/*.ts"] },
+  "files": { "includes": ["scripts/**/*.ts", "tests/**/*.ts", "packages/contracts/src/**/*.ts", "packages/contracts/test/**/*.ts"] },
   "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 160 },
   "linter": { "enabled": true, "rules": { "recommended": true } },
   "assist": { "actions": { "source": { "organizeImports": "on" } } }

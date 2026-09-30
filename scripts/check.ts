@@ -6,5 +6,5 @@ await main(async () => {
   const root = process.argv[2];
   if (!root || process.argv.length !== 3) throw new FoundationError("Exactly one inventory root is required");
   const paths = await verifyPackages(root);
-  console.log(`Foundation inventory: ${paths.length} private root manifest; 0 publishable packages; packing N/A (.1).`);
+  console.log(`Pylons inventory: 1 private root manifest; ${paths.length - 1} publishable packages; local consumer verification is a separate gate.`);
 });
