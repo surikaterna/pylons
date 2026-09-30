@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "pylons",
+  "project_id": "36335d99-363b-4c08-8c59-db35e9d2cf7a"
+}
