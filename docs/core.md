@@ -103,6 +103,34 @@ and diagnosed, but cannot retroactively change a settled shutdown result. Truste
 can bypass in-process APIs; namespacing is not a sandbox. No RPC, intent framework, source
 precedence resolver, HTTP/MF adapter, logger vendor or UI was added.
 
+### Request-local invocation deadline ownership — armada-44vqo
+
+Provider execution and per-call authorization have invocation-local boundaries. A deadline
+latches its outcome before synchronously cancelling that call's local context and releasing
+owned parent subscriptions/timers. Cooperative work therefore observes cancellation **before**
+the timeout result returns, without waiting for a later caller cancellation or runtime shutdown.
+Provider timeout remains `provider-failed`; authorization timeout remains `denied` and cannot
+enter a provider, even if cancellation callbacks synchronously settle work, cancel the caller,
+or shut down the runtime. Earlier caller/shutdown/revocation cancellation retains its existing
+outcome and readiness checks. Generic source/load/activation/replacement/cleanup boundaries
+and `CancellationSource.dispose` semantics are unchanged.
+
+Successful, typed-failure and rejected completed operations are not spuriously cancelled.
+Their local links are disposed only after actual settlement. Abandoned operations instead
+retain permanently latched cancellation when links are released. Each invocation owns its own
+signal: timeout does not cancel the caller, another request, a shared generation, or coordinator.
+Core owns this propagation, **not** the provider's interval/socket/resource disposal. Providers
+and hosts release those resources cooperatively. Ignoring cancellation can still leave work
+running; late resolution/rejection is consumed without changing the latched public result or
+publishing into a recovered generation. No forced termination or sandbox guarantee is added.
+
+Deterministic core regressions and the original public-API real-clock probe exercise timeout
+before external cancellation, authority hangs, reentry, isolation, late settlement and cleanup.
+The probe requires cooperative interval release before shutdown/caller controls and reports
+zero fallback cleanups on a passing run. It is a correction proof, **not** the .7 D01–D09 demo.
+The separate core PATCH changeset accompanies the existing initial MINOR; versions remain
+0.0.0 and their combined future intent remains 0.1.0, without versioning or publication.
+
 ## Packaging and provenance
 
 Root inventory allows only exact contracts/core public manifests plus existing private harness

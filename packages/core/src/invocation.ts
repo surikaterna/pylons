@@ -1,6 +1,6 @@
 import type { Cancellation, Capability, InvocationContext, InvocationFailure, JsonValue, Provider, Result } from "@pylons/contracts";
-import { bounded } from "./boundary.js";
 import { CancellationSource } from "./cancellation.js";
+import { invocationOperation } from "./invocation-operation.js";
 import type { RuntimeOptions } from "./types.js";
 
 export interface InvocationGuard {
@@ -31,7 +31,7 @@ async function invoke(
   input: JsonValue,
   request: InvocationContext,
   guard: InvocationGuard,
-  cancellation: Cancellation,
+  cancellation: CancellationSource,
 ): Promise<Result<JsonValue, InvocationFailure>> {
   const context: InvocationContext = Object.freeze({
     ...request,
@@ -42,18 +42,20 @@ async function invoke(
   });
   if (context.cancellation.cancelled) return { success: false, error: { code: "cancelled" } };
   if (!guard.ready() || !(await guard.admit())) return { success: false, error: { code: "unavailable" } };
-  const authorization = await bounded(
+  const authorization = await invocationOperation(
     () => options.authority.authorize({ verifiedContext: options.context, capability, invocation: context }),
     options.clock,
     options.bounds.policy,
-    context.cancellation,
+    cancellation,
   );
+  if (authorization.kind === "timeout") return { success: false, error: { code: "denied" } };
   if (authorization.kind !== "value" || authorization.value.kind !== "allow")
     return { success: false, error: { code: context.cancellation.cancelled ? "cancelled" : "denied" } };
   if (!guard.ready() || !(await guard.admit()) || context.cancellation.cancelled) return { success: false, error: { code: "unavailable" } };
   const provider = guard.provider();
   if (!provider) return { success: false, error: { code: "unavailable" } };
-  const result = await bounded(() => provider.invoke(input, context), options.clock, options.bounds.invocation, context.cancellation);
+  const result = await invocationOperation(() => provider.invoke(input, context), options.clock, options.bounds.invocation, cancellation);
+  if (result.kind === "timeout") return { success: false, error: { code: "provider-failed" } };
   if (!guard.ready()) return { success: false, error: { code: "unavailable" } };
   if (result.kind !== "value") return { success: false, error: { code: context.cancellation.cancelled ? "cancelled" : "provider-failed" } };
   return result.value;
