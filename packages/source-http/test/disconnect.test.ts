@@ -43,12 +43,13 @@ test("real hanging HTTP stream aborts underlying connection on caller cancellati
 });
 
 test("real declared oversized valid JSON is rejected by transport before parsing", async () => {
+  const body = `{}${" ".repeat(9998)}`;
   const server = Bun.listen({
     port: 0,
     hostname: "127.0.0.1",
     socket: {
       data(socket) {
-        socket.end("HTTP/1.1 200 OK\r\nContent-Length: 10000\r\nConnection: close\r\n\r\n{}");
+        socket.end(`HTTP/1.1 200 OK\r\nContent-Length: 10000\r\nConnection: close\r\n\r\n${body}`);
       },
     },
   });
