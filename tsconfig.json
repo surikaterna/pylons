@@ -16,5 +16,5 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true
   },
-   "include": ["scripts/**/*.ts", "tests/**/*.ts", "apps/**/*.ts", "plugins/basic-validation/src/**/*.ts", "packages/contracts/test/**/*.ts", "packages/core/test/**/*.ts"]
+   "include": ["scripts/**/*.ts", "tests/**/*.ts", "apps/**/*.ts", "plugins/basic-validation/src/**/*.ts", "packages/contracts/test/**/*.ts", "packages/core/test/**/*.ts", "packages/source-http/test/**/*.ts"]
 }

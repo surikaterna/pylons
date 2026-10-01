@@ -1,5 +1,12 @@
 # Tooling and contracts validation (.2)
 
+The .5 extension is documented in [HTTP source](source-http.md). Current exact
+inventory is three public packages (contracts/core/source-http) and six private
+manifests. All root gates include source tests/build/compiled ESM verification;
+verify:packages additionally packs/installs source with contracts only and runs
+strict neutral declarations and a real browser HTTP consumer. Historical stage
+counts/descriptions below remain historical, not current inventory assertions.
+
 The .4 extension is documented in [core](core.md): root lint/typecheck/test/build
 and package verification include the new core and its own exact closure profile.
 Public inventory is now contracts/core only; six root/private harness manifests

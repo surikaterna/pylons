@@ -14,6 +14,8 @@
 /packages/contracts/node_modules/
 /packages/core/dist/
 /packages/core/node_modules/
+/packages/source-http/dist/
+/packages/source-http/node_modules/
 .env
 .env.*
 .feasibility-build/

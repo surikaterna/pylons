@@ -154,3 +154,37 @@ gates include the new exact public package/profile; no blanket closure weakening
 No Ghost edits/adoption, HTTP/MF productization, logger replacement, registry
 publication, versioning, PR/merge or later issue implementation. No substantive
 source commit/push before exact independent Auditor approval.
+
+## HTTP metadata source stage (.5)
+
+Canonical armada-0wq76.5, Builder gate `01a0f4ce-f709-7403-8f00-3e7729c2940e`:
+.2 verified/pushed, .3 runtime proof passed, .4 verified/pushed at
+`5abc6113414f5fed86b712709e5bd49066b502f5`. Clean core HEAD and remote
+`refs/heads/feature/pylons-core` independently matched this exact base.
+From that worktree `bd worktree create worktrees/source-http --branch
+feature/pylons-source-http --json` created the branch at that SHA. Because bd
+interpreted the relative path against core's cwd, its returned location was
+`core/worktrees/source-http`; before implementation `git worktree move` corrected
+it to `/home/sprawl/projects/pylons/worktrees/source-http`. No second database,
+replacement branch, code change or commit was used to correct the location.
+Final worktree HEAD/common-Git and shared target Beads identities were checked
+again against root and differ from canonical Ghost. The same target-documented
+bd1.2.2 false is_redirected exception remains, not an isolated database.
+
+All `packages/source-http` source/tests and dedicated packaging/consumer tooling
+are NEW owned MIT implementations, not a Ghost file port. The exact source plan
+matrix marks HTTP as NEW. Documentation6169eb2/runtime146f733 and local plan/
+handoff retain their previously documented roles; PRD FR01/02/03/09/10 and
+ARB AR01/02/03/07/08 inform the scoped implementation. No source scripts, data,
+tenant demo manifest, schema catalog or domain APIs were copied. Unmodified
+contracts parsers/ports at the target base are reused as the sole runtime edge.
+Third-party fetch host implementations/Zod/tooling keep their independent terms.
+
+Existing contracts/core APIs/source/minor changesets and private feasibility
+apps/plugins/tests remain unchanged. Root gate/inventory/profile extensions and
+the exact source output ignores are necessary to validate the new publishable
+package, not wholesale graph weakening. See [HTTP source](source-http.md) and
+its package README for exact metadata wire shape and catalog limits. Source
+stays0.0.0; new minor changeset records future0.1.0 intent without versioning.
+No Ghost edits/adoption, registry publishing, PR/merge, logger/runtime fallback
+or .6-.9 implementation. No substantive source commit/push before Auditor.

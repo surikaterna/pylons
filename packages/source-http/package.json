@@ -1,0 +1,14 @@
+{
+  "name": "@pylons/source-http",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Authorized bounded HTTP metadata reads for Pylons",
+  "license": "MIT",
+  "sideEffects": false,
+  "files": ["dist", "README.md", "LICENSE"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./fetch": { "types": "./dist/fetch.d.ts", "import": "./dist/fetch.js" }
+  },
+  "dependencies": { "@pylons/contracts": "0.0.0" }
+}

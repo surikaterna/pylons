@@ -30,7 +30,11 @@ export function validateDeclarationFiles(files: readonly string[], profile: Pack
   if (!files.some((file) => /\/zod\/v3\//.test(file))) throw new FoundationError("Missing selected v3 declaration closure");
   const forbidden = files.some((file) => /lib\.dom|\/@types\/|\/zod\/v4|ghost|weaver|react|federation|\/packages\/core\/|\/slf|\/debug\//i.test(file));
   if (forbidden) throw new FoundationError("Forbidden declaration dependency");
-  if (profile === "contracts" && files.some((file) => /\/@pylons\/core\//.test(file))) throw new FoundationError("Core cannot enter contracts closure");
+  if (profile !== "core" && files.some((file) => /\/@pylons\/core\//.test(file))) throw new FoundationError("Core cannot enter neutral package closure");
+  if (profile !== "source-http" && files.some((file) => /\/@pylons\/source-http\//.test(file)))
+    throw new FoundationError("Source cannot enter other package closure");
+  if (profile === "source-http" && !files.some((file) => /\/@pylons\/source-http\/dist\/index\.d\.ts$/.test(file)))
+    throw new FoundationError("Missing source declaration closure");
   if (profile === "core" && !files.some((file) => /\/@pylons\/core\/dist\/index\.d\.ts$/.test(file)))
     throw new FoundationError("Missing selected core declaration closure");
 }
@@ -50,13 +54,13 @@ export async function installedGraph(consumer: string, profile: PackageProfile =
     if ((await lstat(path)).isSymbolicLink()) throw new FoundationError("Installed package symlink is forbidden");
     validateInstalledManifest(JSON.parse(await readFile(join(path, "package.json"), "utf8")), profile);
   }
-  if (paths.length !== (profile === "core" ? 3 : 2)) throw new FoundationError("Installed graph must match exact package profile");
+  if (paths.length !== (profile === "contracts" ? 2 : 3)) throw new FoundationError("Installed graph must match exact package profile");
   return paths;
 }
 
 function resolveImport(specifier: string, file: string, modules: string, profile: PackageProfile): string {
   if (specifier === "zod/v3") return join(modules, "zod/v3/index.js");
-  if (profile === "core" && specifier === "@pylons/contracts") return join(modules, "@pylons/contracts/dist/index.js");
+  if (profile !== "contracts" && specifier === "@pylons/contracts") return join(modules, "@pylons/contracts/dist/index.js");
   if (specifier.startsWith(".")) return resolve(dirname(file), specifier);
   throw new FoundationError("Unexpected JavaScript runtime import");
 }

@@ -4,6 +4,7 @@ import { buildContracts } from "./contracts-build.js";
 import { buildCore } from "./core-build.js";
 import { verifyPackages } from "./inventory.js";
 import { main, run } from "./process.js";
+import { buildSource } from "./source-build.js";
 
 await main(async () => {
   const root = process.cwd();
@@ -13,5 +14,6 @@ await main(async () => {
   await verifyOutputs(root);
   await buildContracts(root);
   await buildCore(root);
-  console.log("Pylons build: bounded tooling, contracts/core ESM/declarations verified.");
+  await buildSource(root);
+  console.log("Pylons build: bounded tooling, contracts/core/source ESM/declarations verified.");
 });

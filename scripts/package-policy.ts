@@ -29,6 +29,26 @@ export function validateCoreManifest(value: unknown): void {
   if (!equal(value, coreManifest)) throw new FoundationError("Core manifest must match approved ESM facade and exact dependency");
 }
 
+export const sourceManifest = {
+  name: "@pylons/source-http",
+  version: "0.0.0",
+  type: "module",
+  description: "Authorized bounded HTTP metadata reads for Pylons",
+  license: "MIT",
+  sideEffects: false,
+  files: ["dist", "README.md", "LICENSE"],
+  exports: {
+    ".": { types: "./dist/index.d.ts", import: "./dist/index.js" },
+    "./fetch": { types: "./dist/fetch.d.ts", import: "./dist/fetch.js" },
+  },
+  dependencies: { "@pylons/contracts": "0.0.0" },
+};
+
+export function validateSourceManifest(value: unknown): void {
+  rejectRuntimeLinks(value);
+  if (!equal(value, sourceManifest)) throw new FoundationError("Source manifest must match approved neutral/fetch exports and exact dependency");
+}
+
 function equal(left: unknown, right: unknown): boolean {
   if (left === right) return true;
   if (Array.isArray(left) && Array.isArray(right)) return left.length === right.length && left.every((value, index) => equal(value, right[index]));
@@ -43,11 +63,15 @@ export function validateContractsManifest(value: unknown): void {
   if (!equal(value, contractsManifest)) throw new FoundationError("Contracts manifest must match approved ESM facade and exact dependency");
 }
 
-export type PackageProfile = "contracts" | "core";
+export type PackageProfile = "contracts" | "core" | "source-http";
 
 export function validateInstalledManifest(value: unknown, profile: PackageProfile = "contracts"): void {
   rejectRuntimeLinks(value);
   const manifest = record(value);
+  if (profile === "source-http" && manifest.name === "@pylons/source-http") {
+    validateSourceManifest(value);
+    return;
+  }
   if (profile === "core" && manifest.name === "@pylons/core") {
     validateCoreManifest(value);
     return;
