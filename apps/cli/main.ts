@@ -1,25 +1,78 @@
-import debug from "debug";
-import { activate } from "../../tests/feasibility/activation.js";
-import { bunLoader } from "../../tests/feasibility/loader-bun.js";
-import { bindLogging } from "../../tests/feasibility/logging-bootstrap.js";
-import { requestContext } from "../../tests/feasibility/request-context.js";
-import { isObject } from "../../tests/feasibility/artifact-index.js";
+import { authenticate } from "../shared/authority.js";
+import { serverHost } from "../shared/bootstrap-server.js";
+import { document, object } from "../shared/domain.js";
+import type { DemoHost } from "../shared/host.js";
+import { bindLogging } from "../shared/logging.js";
 
-debug.enable("pylons:*");
-bindLogging();
-const origin = process.argv[2];
-const title = process.argv[3];
-try {
-  if (!origin || title === undefined) throw new Error("arguments-invalid");
-  const session = await activate(origin, "cli", bunLoader(origin));
+async function session(host: DemoHost): Promise<void> {
+  let buffer = "";
+  const pending = new Set<Promise<void>>();
+  const reader = Bun.stdin.stream().getReader();
+  const decoder = new TextDecoder("utf-8", { fatal: true });
   try {
-    const first = await session.invoke({ title }, requestContext("cli-first"));
-    const second = await session.invoke({ title }, requestContext("cli-second"));
-    console.log(JSON.stringify({ host: "cli", first, second, counts: session.counts() }));
-    if (!first.success) process.exitCode = 2;
-    else if (isObject(first.data) && first.data.valid === false) process.exitCode = 1;
-  } finally { await session.stop(); }
+    while (true) {
+      const next = await reader.read();
+      if (next.done) break;
+      buffer += decoder.decode(next.value, { stream: true });
+      if (buffer.length > 100000) throw new Error("input-failed");
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      dispatch(host, lines, pending);
+    }
+    buffer += decoder.decode();
+    if (buffer.trim()) pending.add(command(host, buffer));
+  } finally {
+    reader.releaseLock();
+  }
+  await Promise.all(pending);
+}
+function dispatch(host: DemoHost, lines: readonly string[], pending: Set<Promise<void>>): void {
+  for (const line of lines) {
+    if (!line) continue;
+    const work = command(host, line).finally(() => pending.delete(work));
+    pending.add(work);
+  }
+}
+async function command(host: DemoHost, line: string): Promise<void> {
+  try {
+    const value: unknown = JSON.parse(line);
+    const id = object(value) && typeof value.id === "number" ? value.id : 0;
+    console.log(JSON.stringify({ id, response: await host.command(value) }));
+  } catch {
+    console.log(JSON.stringify({ id: 0, response: { error: "input-failed" } }));
+  }
+}
+async function main(): Promise<void> {
+  bindLogging();
+  const origin = process.argv[2];
+  if (!origin) throw new Error("input-failed");
+  const interactive = process.argv[3] === "--session";
+  const credential = interactive ? undefined : authenticate(process.argv[3]);
+  if (!interactive && !credential) throw new Error("auth-failed");
+  const input: unknown = interactive ? null : JSON.parse(await Bun.file(process.argv[4] ?? "").text());
+  if (!interactive && !document(input)) throw new Error("input-failed");
+  const host = await serverHost(origin, "cli");
+  try {
+    if (interactive) {
+      console.log(JSON.stringify({ ready: true }));
+      await session(host);
+      return;
+    }
+    if (!credential) throw new Error("auth-failed");
+    await host.discover(credential.tenant);
+    host.policy.initialize(true);
+    await host.scoped(credential.tenant).startup();
+    const result = await host.validate(process.argv[3], input);
+    console.log(JSON.stringify(result));
+    process.exitCode = result.code;
+  } finally {
+    const stopped = await host.shutdown();
+    if (stopped.results.some((result) => !result.success)) process.exitCode = 2;
+  }
+}
+try {
+  await main();
 } catch {
-  console.error("infrastructure-failed");
+  console.error("demo-infrastructure-failed");
   process.exitCode = 2;
 }

@@ -3,9 +3,10 @@ import { join, resolve } from "node:path";
 import { validateContractsManifest, validateCoreManifest, validateLoaderManifest, validateSourceManifest } from "./package-policy.js";
 import { FoundationError, record, rejectRuntimeLinks, validateManifest } from "./policy.js";
 
-const excluded = new Set([".git", ".beads", "node_modules", "worktrees", ".foundation-build", ".feasibility-build", ".loader-build"]);
+const excluded = new Set([".git", ".beads", "node_modules", "worktrees", ".foundation-build", ".feasibility-build", ".loader-build", ".demo-build"]);
 const privateManifests = new Map([
   ["plugins/basic-validation", "pylons-private-basic-validation"],
+  ["plugins/reference-required", "pylons-private-reference-required"],
   ["apps/web-server", "pylons-private-web-server"],
   ["apps/browser", "pylons-private-browser"],
   ["apps/cli", "pylons-private-cli"],

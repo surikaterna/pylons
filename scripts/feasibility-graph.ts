@@ -4,13 +4,13 @@ import ts from "typescript";
 import { FoundationError } from "./policy.js";
 
 export async function hostGraph(root: string, host: string): Promise<readonly string[]> {
-  const pending = [resolve(root, `apps/${host}/main.ts`)];
+  const pending = [resolve(root, `tests/feasibility/apps/${host}/main.ts`)];
   const visited = new Set<string>();
   while (pending.length) {
     const file = pending.pop();
     if (!file || visited.has(file)) continue;
     const path = relative(root, file);
-    if (path.startsWith("..") || path.startsWith("plugins/") || path.startsWith("packages/contracts/test"))
+    if (path.startsWith("..") || path.startsWith("plugins/") || path.startsWith("tests/feasibility/plugins/") || path.startsWith("packages/contracts/test"))
       throw new FoundationError("Forbidden host implementation edge");
     visited.add(file);
     const source = ts.createSourceFile(file, await readFile(file, "utf8"), ts.ScriptTarget.Latest, true);

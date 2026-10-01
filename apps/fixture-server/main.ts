@@ -1,49 +1,126 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { parseArtifacts } from "../../tests/feasibility/artifact-index.js";
-import { fixturePlan } from "../../tests/feasibility/fixture-metadata.js";
-import { cleanupRejectionArtifact } from "../../tests/feasibility/server-negative-artifacts.js";
+import type { Host } from "@pylons/contracts";
+import type { Artifact } from "../shared/definitions.js";
+import { tenant } from "../shared/domain.js";
+import { parseArtifacts } from "../shared/source.js";
+import { control } from "./control.js";
+import { resolvedPlan, type ScopeState, state } from "./state.js";
 
-export type ServerFault = "hash" | "disabled" | "status" | "timeout" | "disconnect" | "cleanup";
-
-export async function startFixture(tamper?: ServerFault) {
-  const output = resolve(import.meta.dir, "../../.feasibility-build");
-  const original = parseArtifacts(JSON.parse(await readFile(resolve(output, "artifacts.json"), "utf8")));
-  const faultBytes = tamper === "cleanup" ? cleanupRejectionArtifact(await readFile(resolve(output, "bun/remoteEntry.js"))) : undefined;
-  const artifacts = original.map((entry) => entry.target === "bun" && faultBytes ? { ...entry, bytes: faultBytes.length, sha256: new Bun.CryptoHasher("sha256").update(faultBytes).digest("hex") } : entry);
-  const trace: { path: string; status: number; bytes: number }[] = [];
-  const requests: string[] = [];
-  const server = Bun.serve({ port: 0, async fetch(request) {
-    const path = new URL(request.url).pathname.slice(1);
-    requests.push(path);
-    if (path === "bun/remoteEntry.js" && tamper === "disconnect") {
-      await server.stop(true);
-      return new Response(null, { status: 503 });
-    }
-    const response = await respond(path, server.url.href, output, artifacts, tamper, faultBytes);
-    const bytes = await response.arrayBuffer();
-    trace.push({ path, status: response.status, bytes: bytes.byteLength });
-    return new Response(bytes, { status: response.status, headers: { "access-control-allow-origin": "*", "content-type": path === "browser" ? "text/html" : path.endsWith(".js") ? "text/javascript" : "application/json", "cache-control": "no-store" } });
-  } });
-  return { origin: server.url.href, trace, requests, artifacts, stop: () => server.stop(true) };
+export interface HttpTrace {
+  readonly path: string;
+  readonly status: number;
+  readonly bytes: number;
+  readonly sha256: string;
+  readonly at: number;
 }
-
-async function respond(path: string, origin: string, output: string, artifacts: ReturnType<typeof parseArtifacts>, tamper?: ServerFault, faultBytes?: Uint8Array<ArrayBuffer>) {
-  if (path === "bun/remoteEntry.js" && tamper === "status") return new Response("SECRET_CONFIG_SENTINEL", { status: 503 });
-  if (path === "bun/remoteEntry.js" && tamper === "timeout") return new Promise<Response>(() => {});
-  if (path === "bun/remoteEntry.js" && faultBytes) return new Response(faultBytes);
-  const host = path.slice("metadata/".length);
-  if (path.startsWith("metadata/") && (host === "server" || host === "browser" || host === "cli")) {
-    const artifact = artifacts.find((entry) => entry.target === (host === "browser" ? "browser" : "bun"));
-    if (artifact) {
-      const plan = fixturePlan(host, origin, tamper === "hash" ? { ...artifact, sha256: "0".repeat(64) } : artifact);
-      const installation = plan.inventory.installations[0];
-      if (tamper === "disabled" && installation) installation.enabled = false;
-      return Response.json(plan);
-    }
+export async function startFixture(port = 0, horizon = 10000) {
+  const output = resolve(import.meta.dir, "../../.demo-build");
+  const artifacts = parseArtifacts(JSON.parse(await readFile(resolve(output, "artifacts.json"), "utf8")));
+  const scopes = { a: state(Date.now() + horizon), b: state(Date.now() + horizon) };
+  scopes.b.values["basic-validation"].minLength = 8;
+  const trace: HttpTrace[] = [];
+  const requests: string[] = [];
+  const held = new Map<string, { promise: Promise<void>; release: () => void }>();
+  const faults = new Set<string>();
+  const server = Bun.serve({
+    hostname: "127.0.0.1",
+    port,
+    async fetch(request) {
+      const path = new URL(request.url).pathname.slice(1);
+      requests.push(path);
+      const response = await route(path, request, server.url.href, output, artifacts, scopes, held, faults);
+      const bytes = await response.arrayBuffer();
+      trace.push({
+        path,
+        status: response.status,
+        bytes: bytes.byteLength,
+        sha256: new Bun.CryptoHasher("sha256").update(bytes).digest("hex"),
+        at: Date.now(),
+      });
+      return responseBytes(path, bytes, response.status);
+    },
+    error: () => Response.json({ error: "fixture-failed" }, { status: 503 }),
+  });
+  return {
+    origin: server.url.href,
+    scopes,
+    trace,
+    requests,
+    artifacts,
+    hold(key: string) {
+      createHold(held, key);
+    },
+    release(key: string) {
+      release(held, key);
+    },
+    fail(path: string) {
+      faults.add(path);
+    },
+    async stop() {
+      for (const key of held.keys()) release(held, key);
+      await server.stop(true);
+    },
+  };
+}
+function responseBytes(path: string, bytes: ArrayBuffer, status: number): Response {
+  return new Response(bytes, {
+    status,
+    headers: {
+      "access-control-allow-origin": "*",
+      "access-control-allow-headers": "authorization,content-type",
+      "cache-control": "no-store",
+      "content-type": path.endsWith(".js") ? "text/javascript" : path.endsWith(".css") ? "text/css" : path === "browser" ? "text/html" : "application/json",
+    },
+  });
+}
+function createHold(held: Map<string, { promise: Promise<void>; release: () => void }>, key: string): void {
+  let complete = () => {};
+  const promise = new Promise<void>((resolve) => {
+    complete = resolve;
+  });
+  held.set(key, { promise, release: complete });
+}
+function release(held: Map<string, { promise: Promise<void>; release: () => void }>, key: string): void {
+  held.get(key)?.release();
+  held.delete(key);
+}
+async function route(
+  path: string,
+  request: Request,
+  origin: string,
+  output: string,
+  artifacts: readonly Artifact[],
+  scopes: { a: ScopeState; b: ScopeState },
+  held: Map<string, { promise: Promise<void>; release: () => void }>,
+  faults: ReadonlySet<string>,
+): Promise<Response> {
+  if (request.method === "OPTIONS") return new Response(null, { status: 204 });
+  if (path === "control") return control(request, scopes);
+  await held.get(path)?.promise;
+  if (faults.has(path)) return Response.json({ error: "SECRET_ERROR_SENTINEL" }, { status: 503 });
+  if (path === "operator/artifacts")
+    return request.headers.get("authorization") === "Bearer demo-operator" ? Response.json(artifacts) : new Response(null, { status: 401 });
+  if (path.startsWith("metadata/") || path.startsWith("catalog/")) return metadata(path, request, origin, artifacts, scopes);
+  if (path.startsWith("init/")) return Response.json({ initialized: true });
+  if (artifacts.some((artifact) => artifact.file === path)) return new Response(await readFile(resolve(output, path)));
+  if (path === "host/browser.js" || path === "styles.css")
+    return new Response(await readFile(resolve(output, path === "styles.css" ? "styles.css" : "hosts/browser.js")));
+  if (path === "browser") return new Response(await readFile(resolve(output, "index.html")));
+  if (path.startsWith("documents/") && ["short", "long", "empty", "no-reference"].includes(path.slice(10))) {
+    const name = path.slice(10);
+    return Response.json({
+      title: name === "empty" ? "" : name === "short" ? "four" : "A long document title",
+      ...(name === "long" ? { reference: "REF-1" } : {}),
+    });
   }
-  if (artifacts.some((entry) => entry.file === path)) return new Response(await readFile(resolve(output, path)));
-  if (path === "host/browser.js") return new Response(await readFile(resolve(output, "hosts/browser.js")));
-  if (path === "browser") return new Response('<!doctype html><html><title>Private feasibility</title><body><pre id="result" role="status">Loading</pre><script src="/host/browser.js"></script></body></html>');
-  return new Response("not-found", { status: 404 });
+  if (path === "trace") return Response.json([]);
+  return new Response(null, { status: 404 });
+}
+function metadata(path: string, request: Request, origin: string, artifacts: readonly Artifact[], scopes: { a: ScopeState; b: ScopeState }): Response {
+  const [, host, scope] = path.split("/");
+  if (!tenant(scope) || !(host === "server" || host === "browser" || host === "cli")) return new Response(null, { status: 404 });
+  if (request.headers.get("authorization") !== `Bearer metadata-${host}-${scope}` || !scopes[scope].authorized) return new Response(null, { status: 403 });
+  if (scopes[scope].outage) return new Response(null, { status: 503 });
+  return Response.json(resolvedPlan(host satisfies Host, scope, origin, artifacts, scopes[scope]));
 }

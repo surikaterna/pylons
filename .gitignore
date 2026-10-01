@@ -22,3 +22,4 @@
 /.loader-build/
 /packages/loader-mf/dist/
 /packages/loader-mf/node_modules/
+.demo-build/

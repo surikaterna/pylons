@@ -61,7 +61,7 @@ async function inventory(target: "browser" | "bun") {
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 const author = await Bun.build({
-  entrypoints: [resolve(root, "plugins/basic-validation/src/factory.ts")],
+  entrypoints: [resolve(root, "tests/feasibility/plugins/basic-validation/factory.ts")],
   outdir: resolve(output, "author"),
   target: "browser",
   external: ["slf"],
@@ -74,7 +74,7 @@ const artifacts = await Promise.all([inventory("browser"), inventory("bun")]);
 await writeFile(resolve(output, "artifacts.json"), `${JSON.stringify(artifacts, null, 2)}\n`);
 for (const host of ["browser", "cli", "web-server"]) {
   const result = await Bun.build({
-    entrypoints: [resolve(root, `apps/${host}/main.ts`)],
+    entrypoints: [resolve(root, `tests/feasibility/apps/${host}/main.ts`)],
     outdir: resolve(output, "hosts"),
     naming: `${host}.js`,
     target: host === "browser" ? "browser" : "bun",
@@ -82,7 +82,7 @@ for (const host of ["browser", "cli", "web-server"]) {
   });
   if (!result.success) throw new FoundationError(`Host build failed: ${host}`);
   const source = await readFile(resolve(output, `hosts/${host}.js`), "utf8");
-  if (source.includes("remote evaluated") || source.includes("remote activated") || source.includes("plugins/basic-validation/src"))
+  if (source.includes("remote evaluated") || source.includes("remote activated") || source.includes("tests/feasibility/plugins/basic-validation"))
     throw new FoundationError("Plugin leaked into host build");
 }
 console.log(JSON.stringify({ bun: Bun.version, webpack: webpack.version, artifacts }));

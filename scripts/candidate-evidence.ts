@@ -3,9 +3,11 @@ import { readFile } from "node:fs/promises";
 import { capture } from "./pack-check.js";
 import { FoundationError } from "./policy.js";
 
-const paths = [
-  ...new Set(capture(["git", "ls-files", "--modified", "--others", "--exclude-standard", "-z"], process.cwd()).split("\0").filter(Boolean)),
-].sort();
+const deleted = new Set(capture(["git", "diff", "--name-only", "--diff-filter=D", "-z"], process.cwd()).split("\0").filter(Boolean));
+const paths = [...new Set(capture(["git", "ls-files", "--modified", "--others", "--exclude-standard", "-z"], process.cwd()).split("\0").filter(Boolean))]
+  .filter((path) => !deleted.has(path))
+  .sort();
+for (const path of [...deleted].sort()) console.log(`Deleted baseline path (not a current file hash): ${path}`);
 const fingerprint = createHash("sha256");
 for (const path of paths) {
   const bytes = await readFile(path);

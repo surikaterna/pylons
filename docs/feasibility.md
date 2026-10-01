@@ -186,3 +186,32 @@ contracts initial-minor changeset remains intact. Source rights are owner-approv
 MIT Copyright (c) Surikaterna; third-party packages retain their own terms.
 No substantive source commit/push before independent Auditor. Canonical evidence
 and status remain on Ghost armada-0wq76.3; no duplicate target issue or new issue.
+
+## Dedicated regression inputs during .7 composition
+
+At .7 base `9c1eb16d6f11361863ab1eaa2949fa23e74d0ab2`, the early host
+entrypoints/HTTP boundary and author factory were copied into
+`tests/feasibility/apps/{web-server,browser,cli,fixture-server}` and
+`tests/feasibility/plugins/basic-validation/factory.ts`. Their only source changes
+are relative import/output paths. Original `apps/*` and `plugins/*` bytes remain
+unchanged at this preflight boundary; they are not the final demonstration.
+The feasibility build, graph and real-server negative runner now consume these
+dedicated inputs. Host graphs reject both the original and copied plugin roots.
+All original behavioral assertions remain. The copies retain the original
+formatter exclusion; TypeScript and structural principle checks still inspect them.
+The independent `.loader-build` inputs and runner remain unchanged.
+
+Development MF output is path-sensitive: neither the former worktree nor former
+input paths promise identical artifact bytes. At this exact demo worktree, before
+retargeting, browser/Bun SHA256 were respectively
+`9d57d3cdb719ebe1191793bab007f18b4a2ff42753c0bef6cf45e25ff41c65d0`
+and `2d4469619b13e70f22351d91a619d6336548cbacd1ba91a1fae281b9318c7671`.
+After retargeting, the actual browser container is 389291 bytes, SHA256
+`9736a4e920876694a77a52f5d494c14bdebd877f7aa34d198db146612cf3d171`;
+the Bun container is 389284 bytes, SHA256
+`7ac5320a1856b642a15baa9b5784483b25de2fb6581b6f1fe5f2101b49920294`.
+The independently repinned cleanup-negative Bun variant is 389393 bytes, SHA256
+`9e4f110f7cf5daf22b2923a3c1e67af65f6b9ab0271c085016bc951bf47808f4`.
+Real HTTP/hash/status/bytes, preferred root/remote logging and natural-exit
+assertions were rerun, including all five server negatives. These are preserved
+.3/.6 regression receipts, **not D01–D09 final-demo acceptance evidence**.

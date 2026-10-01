@@ -1,6 +1,9 @@
-# Reserved: fixture server
+# Private HTTP fixture issuer
 
-Future private trusted inventory, immutable definitions, revision-bound config
-and separately built HTTP artifacts. Same source port as other consumers;
-may share the web-server process. No implementation or manifest in .1;
-future armada-0wq76.3 and armada-0wq76.7.
+Canonical scoped ResolvedPlan metadata/catalog, operator-trusted generated artifacts,
+known document fixtures and authenticated deterministic control/fault inputs. This
+service NEVER imports or executes plugin implementations. Deadlines are issued once,
+not renewed by reads/outages. Records started requests separately from completed
+fixture-produced responses with actual status/bytes/SHA/timestamps.
+Original early service remains in `tests/feasibility/apps/fixture-server`.
+See [runbook](../../docs/demo.md); lab loopback authority is not production security.

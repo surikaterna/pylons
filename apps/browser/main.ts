@@ -1,24 +1,21 @@
-import debug from "debug";
-import { activate } from "../../tests/feasibility/activation.js";
-import { browserLoader } from "../../tests/feasibility/loader-browser.js";
-import { bindLogging } from "../../tests/feasibility/logging-bootstrap.js";
-import { requestContext } from "../../tests/feasibility/request-context.js";
+import { createBrowserLoader } from "@pylons/loader-mf/browser";
+import { DemoHost } from "../shared/host.js";
+import { bindLogging, diagnostics } from "../shared/logging.js";
+import { loaderOptions, operatorArtifacts } from "../shared/source.js";
+import { attachView } from "./view.js";
 
-debug.enable("pylons:*");
-bindLogging();
-async function run() {
+async function main(): Promise<void> {
+  bindLogging();
   const origin = location.origin;
-  const session = await activate(origin, "browser", browserLoader(origin));
-  try {
-    const first = await session.invoke({ title: "four" }, requestContext("browser-first"));
-    const second = await session.invoke({ title: "" }, requestContext("browser-second"));
-    return { host: "browser", first, second, counts: session.counts() };
-  } finally { await session.stop(); }
+  const artifacts = await operatorArtifacts(origin);
+  const host = new DemoHost("browser", origin, createBrowserLoader(loaderOptions(origin, "browser", artifacts, diagnostics)), artifacts);
+  Reflect.set(globalThis, "__demoHost", host);
+  attachView(host);
+  const discovered = await Promise.all([host.discover("a"), host.discover("b")]);
+  if (host.closed) return;
+  if (discovered.some((value) => !value.result.success)) throw new Error("metadata-failed");
+  host.policy.initialize(true);
+  await Promise.all([host.scoped("a").startup(), host.scoped("b").startup()]);
+  document.getElementById("status")?.replaceChildren("Metadata ready; providers remain lazy.");
 }
-run().then((result) => {
-  const target = document.getElementById("result");
-  if (target) target.textContent = JSON.stringify(result);
-}).catch(() => {
-  const target = document.getElementById("result");
-  if (target) target.textContent = "infrastructure-failed";
-});
+main().catch(() => document.getElementById("status")?.replaceChildren("Infrastructure failed."));

@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { type ServerFault, startFixture } from "../apps/fixture-server/main.js";
+import { type ServerFault, startFixture } from "../tests/feasibility/apps/fixture-server/main.js";
 import { isObject } from "../tests/feasibility/artifact-index.js";
 import { bounded } from "../tests/feasibility/timeout.js";
 import { FoundationError } from "./policy.js";

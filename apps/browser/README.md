@@ -1,5 +1,7 @@
-# Reserved: browser
+# Private browser application
 
-Future private real-browser host with advisory local validation, semantic theme
-tokens and accessible UI. Not a server execution proxy. No implementation or
-manifest in .1; future armada-0wq76.3 and armada-0wq76.7.
+Actual public core/HTTP source/browser loader composition, native semantic form and
+local downloaded-provider validation. Not a server proxy. Co-located view/HTML/styles
+use semantic Pylons tokens, labelled controls, live status and keyboard operation.
+Original early entry remains in `tests/feasibility/apps/browser` for independent proof.
+See [demo runbook](../../docs/demo.md). No publishable browser package or Ghost adoption.

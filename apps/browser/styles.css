@@ -1,0 +1,8 @@
+:root { color-scheme: light dark; --pylons-surface: Canvas; --pylons-text: CanvasText; --pylons-border: GrayText; --pylons-focus: Highlight; }
+body { margin: 0; background: var(--pylons-surface); color: var(--pylons-text); font-family: system-ui, sans-serif; }
+main { max-width: 48rem; padding: 1rem; margin: auto; }
+form { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+input, select, button { font: inherit; padding: .6rem; min-width: 0; background: var(--pylons-surface); color: var(--pylons-text); border: 1px solid var(--pylons-border); }
+:focus-visible { outline: 3px solid var(--pylons-focus); outline-offset: 2px; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (min-width: 40rem) { form { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); } button { grid-column: 2; } }

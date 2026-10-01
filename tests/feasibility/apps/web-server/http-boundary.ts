@@ -1,8 +1,8 @@
 import { LoggerFactory } from "slf";
 import type { PluginDefinition } from "@pylons/contracts";
-import type { activate } from "../../tests/feasibility/activation.js";
-import { requestContext } from "../../tests/feasibility/request-context.js";
-import { bounded } from "../../tests/feasibility/timeout.js";
+import type { activate } from "../../activation.js";
+import { requestContext } from "../../request-context.js";
+import { bounded } from "../../timeout.js";
 
 type Session = Awaited<ReturnType<typeof activate>>;
 type FailureCode = "request-failed" | "activation-failed" | "cleanup-failed" | "shutdown-failed";

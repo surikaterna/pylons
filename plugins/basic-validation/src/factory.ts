@@ -1,41 +1,56 @@
-import type { PluginFactory, Provider } from "@pylons/contracts";
-import { LoggerFactory } from "slf";
+import type { ConfigSideband, PluginFactory } from "@pylons/contracts";
+import { object, validation } from "../../../apps/shared/domain.js";
+import { acquired, remoteEvent } from "../../../apps/shared/trace-contract.js";
+import { initialize, resources } from "../../shared/resources.js";
 
-const logger = LoggerFactory.getLogger("pylons:remote");
-logger.debug("remote evaluated");
-
-function object(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+const plugin = "basic-validation";
+remoteEvent("evaluation", plugin);
+function minimum(configuration: ConfigSideband): number | undefined {
+  const values = configuration.values;
+  return object(values) && typeof values.minLength === "number" && Number.isInteger(values.minLength) && values.minLength > 0 ? values.minLength : undefined;
 }
 
 export const factory: PluginFactory = {
   async activate(context) {
-    const values = context.configuration.values;
-    const minimum = object(values) ? values.minLength : undefined;
-    if (typeof minimum !== "number" || !Number.isInteger(minimum) || minimum < 1) {
-      return { success: false, error: { code: "unsupported-contract" } };
-    }
-    logger.info("remote activated");
-    const provider: Provider = {
+    remoteEvent("activation", plugin, context.generation);
+    let appliedMinimum = minimum(context.configuration);
+    let appliedRevision = context.configuration.revision;
+    if (appliedMinimum === undefined) return { success: false, error: { code: "unsupported-contract" } };
+    resources(context, plugin);
+    if (!(await initialize(context, plugin))) return { success: false, error: { code: "initialization-failed" } };
+    const registration = context.providers.register(validation, {
       async invoke(input, request) {
         if (request.cancellation.cancelled) return { success: false, error: { code: "cancelled" } };
-        if (!request.principal.subjectId || !request.credential.reference || !request.transaction.id) {
-          return { success: false, error: { code: "denied" } };
-        }
-        logger.debug("remote invoked");
+        remoteEvent("invocation", plugin, context.generation, {
+          applied: appliedRevision,
+          subject: request.principal.subjectId,
+          transaction: request.transaction.id,
+          requestMatches: request.credential.reference === `credential:${request.principal.subjectId}`,
+        });
         const title = object(input) ? input.title : undefined;
-        return { success: true, data: { valid: typeof title === "string" && title.length >= minimum } };
-      },
-    };
-    const registration = context.providers.register({ capabilityId: "validation", contractVersion: "1" }, provider);
-    if (!registration.success) return { success: false, error: { code: "initialization-failed" } };
-    context.resources.own({
-      async cleanup() {
-        registration.data.dispose();
-        logger.info("remote cleaned");
-        return { success: true, data: undefined };
+        return { success: true, data: { valid: typeof title === "string" && title.length >= (appliedMinimum ?? 1) } };
       },
     });
-    return { success: true, data: { async cleanup() { return { success: true, data: undefined }; } } };
+    if (!registration.success) return { success: false, error: { code: "initialization-failed" } };
+    acquired(context, plugin, "registration", () => registration.data.dispose());
+    return {
+      success: true,
+      data: {
+        async cleanup() {
+          return { success: true, data: undefined };
+        },
+        async replaceConfiguration(configuration, cancellation) {
+          const next = minimum(configuration);
+          const values = configuration.values;
+          if (cancellation.cancelled) return { kind: "failed", code: "cancelled" };
+          if (next === undefined || (object(values) && values.replace === "fail")) return { kind: "failed", code: "replacement-failed" };
+          if (object(values) && values.replace === "mismatch") return { kind: "applied", appliedRevision: "mismatched" };
+          appliedMinimum = next;
+          appliedRevision = configuration.revision;
+          remoteEvent("replacement", plugin, context.generation, { applied: appliedRevision, desired: appliedRevision });
+          return { kind: "applied", appliedRevision };
+        },
+      },
+    };
   },
 };

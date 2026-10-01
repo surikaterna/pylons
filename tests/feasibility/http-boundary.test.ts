@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { LoggerFactory, type Middleware } from "slf";
-import { HttpBoundary } from "../../apps/web-server/http-boundary.js";
 import type { activate } from "./activation.js";
+import { HttpBoundary } from "./apps/web-server/http-boundary.js";
 import { CleanupFailure, cleanupResources } from "./cleanup.js";
 
 const secret = "SECRET_DOCUMENT_CONFIG_HEADER_ERROR_SENTINEL";

@@ -69,6 +69,9 @@
     "plugins/basic-validation": {
       "name": "pylons-private-basic-validation",
     },
+    "plugins/reference-required": {
+      "name": "pylons-private-reference-required",
+    },
   },
   "packages": {
     "@babel/runtime": ["@babel/runtime@7.29.7", "", {}, "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw=="],
@@ -462,6 +465,8 @@
     "pylons-private-cli": ["pylons-private-cli@workspace:apps/cli"],
 
     "pylons-private-fixture-server": ["pylons-private-fixture-server@workspace:apps/fixture-server"],
+
+    "pylons-private-reference-required": ["pylons-private-reference-required@workspace:plugins/reference-required"],
 
     "pylons-private-web-server": ["pylons-private-web-server@workspace:apps/web-server"],
 

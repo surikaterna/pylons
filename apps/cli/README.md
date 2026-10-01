@@ -1,5 +1,7 @@
-# Reserved: CLI
+# Private plain Bun CLI
 
-Future private plain-text Bun host executing its own provider with meaningful
-exit codes. No app implementation or manifest in .1; future armada-0wq76.3 and
-armada-0wq76.7. Foundation tooling CLI is not this plugin host.
+Actual public runtime/source/server-loader composition. One-shot reads the supplied
+document path, verifies credentials before discovery, executes locally and exits0/1/2.
+`--session` accepts request-ID-tagged newline JSON, including concurrent calls/user
+changes in the SAME process; separate launches are never called warm reuse.
+Original early entry remains in `tests/feasibility/apps/cli`. See [runbook](../../docs/demo.md).

@@ -33,7 +33,7 @@ function inspect(source: ts.SourceFile): string[] {
 }
 
 test("private feasibility sources enforce size/type/export principles", async () => {
-  const patterns = ["apps/**/*.ts", "plugins/basic-validation/src/**/*.ts", "tests/feasibility/**/*.ts", "scripts/feasibility-*.ts"];
+  const patterns = ["tests/feasibility/apps/**/*.ts", "tests/feasibility/plugins/**/*.ts", "tests/feasibility/**/*.ts", "scripts/feasibility-*.ts"];
   for (const pattern of patterns) {
     for await (const path of new Bun.Glob(pattern).scan({ cwd: root })) {
       const source = ts.createSourceFile(path, await readFile(resolve(root, path), "utf8"), ts.ScriptTarget.Latest, true);

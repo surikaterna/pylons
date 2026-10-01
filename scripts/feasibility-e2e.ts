@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { chromium } from "playwright-core";
-import { startFixture } from "../apps/fixture-server/main.js";
+import { startFixture } from "../tests/feasibility/apps/fixture-server/main.js";
 import { isObject } from "../tests/feasibility/artifact-index.js";
 import { serverNegatives } from "./feasibility-server-negatives.js";
 import { FoundationError } from "./policy.js";
