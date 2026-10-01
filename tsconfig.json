@@ -3,7 +3,7 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "types": ["bun"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
@@ -16,5 +16,5 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true
   },
-  "include": ["scripts/**/*.ts", "tests/**/*.ts"]
+   "include": ["scripts/**/*.ts", "tests/**/*.ts", "apps/**/*.ts", "plugins/**/*.ts", "packages/contracts/test/**/*.ts", "packages/core/test/**/*.ts", "packages/source-http/test/**/*.ts", "packages/loader-mf/test/**/*.ts"]
 }

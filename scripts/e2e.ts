@@ -1,6 +1,8 @@
 import { lstat, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { contractsE2e } from "./contracts-e2e.js";
+import { coreE2e } from "./core-e2e.js";
 import { FoundationError, foundationManifest } from "./policy.js";
 import { main } from "./process.js";
 
@@ -30,5 +32,7 @@ await main(async () => {
     throw error;
   });
   if (remains) throw new FoundationError("Foundation fixture cleanup failed");
+  await contractsE2e(process.cwd());
+  await coreE2e(process.cwd());
   console.log("Foundation e2e: compiled tooling valid/invalid subprocess exits and cleanup verified; NOT browser/MF proof.");
 });

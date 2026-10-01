@@ -7,15 +7,59 @@ export const foundationManifest = Object.freeze({
   private: true,
   type: "module",
   packageManager: "bun@1.4.2",
+  workspaces: Object.freeze([
+    "packages/contracts",
+    "packages/core",
+    "packages/source-http",
+    "packages/loader-mf",
+    "plugins/basic-validation",
+    "plugins/reference-required",
+    "apps/web-server",
+    "apps/browser",
+    "apps/cli",
+    "apps/fixture-server",
+  ]),
   scripts: Object.freeze({
-    lint: "biome check scripts tests && bun scripts/check.ts . && bun scripts/check-provenance.ts",
-    typecheck: "bun node_modules/typescript/bin/tsc --project tsconfig.json",
-    test: "bun test tests/tooling.test.ts",
-    build: "bun scripts/build.ts",
-    "test:e2e": "bun scripts/e2e.ts",
-    "verify:packages": "bun scripts/check.ts .",
+    lint: "biome check scripts tests apps plugins packages/contracts/src packages/contracts/test packages/core/src packages/core/test packages/source-http/src packages/source-http/test packages/loader-mf/src packages/loader-mf/test && bun scripts/check.ts . && bun scripts/check-provenance.ts",
+    typecheck:
+      "bun node_modules/typescript/bin/tsc --project packages/contracts/tsconfig.build.json && bun node_modules/typescript/bin/tsc --project packages/core/tsconfig.build.json && bun node_modules/typescript/bin/tsc --project packages/source-http/tsconfig.build.json && bun node_modules/typescript/bin/tsc --project packages/source-http/tsconfig.fetch.json && bun node_modules/typescript/bin/tsc --project packages/loader-mf/tsconfig.build.json && bun node_modules/typescript/bin/tsc --project tsconfig.json && bun node_modules/typescript/bin/tsc --project packages/contracts/tsconfig.json && bun node_modules/typescript/bin/tsc --project packages/core/tsconfig.json",
+    test: "bun test tests packages/contracts/test packages/core/test packages/source-http/test packages/loader-mf/test",
+    build: "bun scripts/build.ts && bun run build:feasibility && bun run build:loader && bun run build:demo",
+    "test:e2e":
+      "bun scripts/e2e.ts && bun scripts/source-e2e.ts && bun run test:feasibility:e2e && bun run test:loader:e2e && bun run test:demo:e2e && bun run test:demo:interactive",
+    "verify:packages":
+      "bun scripts/verify-packages.ts && bun scripts/verify-core-package.ts && bun scripts/verify-source-package.ts && bun scripts/verify-loader-package.ts",
+    "build:loader": "bun scripts/loader-build.ts",
+    "test:loader:e2e": "bun scripts/loader-e2e.ts",
+    "build:feasibility": "bun scripts/feasibility-build.ts",
+    "test:feasibility": "bun test tests/feasibility",
+    "test:feasibility:e2e": "bun scripts/feasibility-e2e.ts",
+    "build:demo": "bun scripts/demo-build.ts",
+    "test:demo": "bun test tests/demo",
+    "test:demo:e2e": "bun scripts/demo-e2e.ts && bun run test:demo:ui && bun run test:demo:clarity && bun run test:demo:diagnostics",
+    "test:demo:diagnostics": "bun scripts/demo-diagnostics-e2e.ts",
+    "test:demo:clarity": "bun scripts/demo-clarity-e2e.ts",
+    "test:demo:ui": "bun scripts/demo-ui-e2e.ts",
+    "test:demo:interactive": "bun scripts/demo-interactive-e2e.ts",
+    demo: "bun scripts/demo-run.ts",
+    "demo:cli": "bun .demo-build/hosts/cli.js",
+    "demo:server": "bun .demo-build/hosts/server.js",
   }),
   devDependencies: Object.freeze({
+    "@pylons/contracts": "workspace:*",
+    "@pylons/core": "workspace:*",
+    "@pylons/source-http": "workspace:*",
+    "@pylons/loader-mf": "workspace:*",
+    "@types/debug": "4.1.12",
+    "@module-federation/enhanced": "2.9.0",
+    "@module-federation/runtime": "2.9.0",
+    "@module-federation/sdk": "2.9.0",
+    webpack: "5.106.2",
+    slf: "2.1.0",
+    "slf-debug": "0.3.2",
+    debug: "4.4.3",
+    "playwright-core": "1.63.0",
+    "@changesets/cli": "2.29.7",
     "@biomejs/biome": "2.4.13",
     "@types/bun": "1.4.0",
     typescript: "5.9.3",
@@ -52,6 +96,9 @@ export function validateManifest(value: unknown): void {
   }
   if (!sameFields(manifest.devDependencies, foundationManifest.devDependencies)) {
     throw new FoundationError("Foundation dependencies must use exact approved pins");
+  }
+  if (JSON.stringify(manifest.workspaces) !== JSON.stringify(foundationManifest.workspaces)) {
+    throw new FoundationError("Only exact approved workspaces are allowed");
   }
 }
 

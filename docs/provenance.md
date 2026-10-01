@@ -82,5 +82,130 @@ were committed. Hooks are not bypassed; no Dolt/Git synchronization is claimed.
 Root worktree creation introduced no hidden ignore delta because /worktrees/
 was already reserved. Generated infrastructure remains as approved, not runtime code.
 
-No changeset: root is private/nonpublishable, and reserved paths have no manifests.
-The next .2 issue remains separate; future publishable changes need reviewed changesets.
+No changeset in .1: root was private/nonpublishable, and reserved paths had no manifests.
+
+## Contracts stage (.2)
+
+Canonical armada-0wq76.2 begins from verified/pushed foundation
+`50214bf41420e56f38264194ab3446443fde1254`. Builder gate
+`01a0f3da-6764-77d5-ad1a-06b832610eea` preserves the logical prerequisite using tracks
+for the stacked unmerged sequence. Implementation worktree is
+`/home/sprawl/projects/pylons/worktrees/contracts`, branch `feature/pylons-contracts`,
+created with bd from foundation; shared target Beads identity is unchanged.
+No source commit/push before independent Auditor; no Ghost adoption or later issue start.
+
+Runtime source revision `146f7336a3e70412e764c07e566edcbf54803836`, exact source paths
+`packages/plugin-contracts/src/disposable.ts` and `event.ts`: selectively adapt sync
+cleanup/subscription shapes into `packages/contracts/src/{disposable,event}.ts`, remove
+emitter/interface commentary and add a separate neutral cancellation port. No whole-file
+move or source deletion. `types.ts`, `schemas.ts`, `parsing.ts` in that same source
+directory and `packages/plugin-contracts/test/parse-plugin-contract.test.mjs` inform
+the rewritten inferred schemas/safe results/tests, not copied implementation. See
+[contracts](contracts.md) for the explicit source-test mapping and semantic divergences.
+Documentation inputs retain the exact SHA and local plan/handoff distinction above;
+previous proposal restoration hashes/transforms remain intact.
+
+Owned Ghost-origin adaptations/new source retain MIT Copyright (c) Surikaterna,
+including package LICENSE. Zod is unmodified third-party MIT by Colin McDonnell;
+dependency terms are retained independently, not relicensed as Surikaterna source.
+Builder schema decision `01a0f3ed-1422-71e1-9565-2ef0bb5276e2` expressly replaces the
+observed source Zod4.5.4 pin with exact Zod3.25.76 via zod/v3 for neutral declaration
+closure. No ambient/DOM shim or skipLibCheck weakening. Installed Zod includes other
+subpaths, but only the selected v3 runtime/declarations participate in the facade.
+Changesets CLI2.29.7 is exact-pinned development-only; the initial minor changeset
+targets the new public package, which remains unpublished0.0.0. No version/publish run.
+
+## Private early feasibility (.3)
+
+Canonical armada-0wq76.3, approved Builder gate
+`01a0f425-c61e-78e2-b72c-34854b2095cb`, tracks verified/pushed .2 at exact
+`473c9cc8285e826014811727cfc021c0eec955d9`. From its clean contracts worktree,
+bd created `/home/sprawl/projects/pylons/worktrees/feasibility`, branch
+`feature/pylons-feasibility`, and the returned HEAD matched that exact remote branch.
+Root/worktree Beads/common-Git identities match the previously proven target
+identity and differ from Ghost, including the same approved false-flag exception.
+
+New private plugin, host/fixture apps, build/graph/e2e scripts and tests/feasibility
+are original owned source, not copied Ghost runtime implementations. Source
+documentation6169eb2/runtime146f733 and the uncommitted plan/handoff retain their roles
+above; the logging ARB informed the private compatibility adapter and probes.
+Public contracts source/manifests and its existing minor changeset are unchanged;
+its internal tsconfig explicitly retains ES2022-only lib as private tooling gains DOM.
+No third-party source patches, public adapter package, registry operation, Ghost
+edit/adoption, PR/merge or .4-.9 implementation. See feasibility.md for actual
+versions, generated targets/hashes, validation boundaries and logger quirks.
+Independent audit still precedes substantive source commit/push.
+
+## Neutral core stage (.4)
+
+Canonical armada-0wq76.4, Builder gate `01a0f482-f9e2-7f0c-a19e-f0b6cdad0173`:
+.2 verified/pushed `473c9cc8285e826014811727cfc021c0eec955d9` and broad migration
+gate .3 verified/pushed `424eff39c9dcc2388aae78c25fc51f63ff8f1eff`. From that clean
+feasibility worktree, bd created `/home/sprawl/projects/pylons/worktrees/core`,
+branch `feature/pylons-core`; exact HEAD matched `git ls-remote` for feasibility.
+Shared target Beads/database/project/common-Git identities match root and differ
+from Ghost, retaining the approved bd1.2.2 false-flag exception.
+
+New core, tests and packaging extensions retain owner-approved MIT. See
+[core](core.md) for exact source paths/full SHAs, selective conceptual adaptations,
+characterization divergences, API choices and limits. Existing contracts source,
+manifest/minor changeset and private feasibility source/tests are unchanged. Root
+gates include the new exact public package/profile; no blanket closure weakening.
+No Ghost edits/adoption, HTTP/MF productization, logger replacement, registry
+publication, versioning, PR/merge or later issue implementation. No substantive
+source commit/push before exact independent Auditor approval.
+
+## HTTP metadata source stage (.5)
+
+Canonical armada-0wq76.5, Builder gate `01a0f4ce-f709-7403-8f00-3e7729c2940e`:
+.2 verified/pushed, .3 runtime proof passed, .4 verified/pushed at
+`5abc6113414f5fed86b712709e5bd49066b502f5`. Clean core HEAD and remote
+`refs/heads/feature/pylons-core` independently matched this exact base.
+From that worktree `bd worktree create worktrees/source-http --branch
+feature/pylons-source-http --json` created the branch at that SHA. Because bd
+interpreted the relative path against core's cwd, its returned location was
+`core/worktrees/source-http`; before implementation `git worktree move` corrected
+it to `/home/sprawl/projects/pylons/worktrees/source-http`. No second database,
+replacement branch, code change or commit was used to correct the location.
+Final worktree HEAD/common-Git and shared target Beads identities were checked
+again against root and differ from canonical Ghost. The same target-documented
+bd1.2.2 false is_redirected exception remains, not an isolated database.
+
+All `packages/source-http` source/tests and dedicated packaging/consumer tooling
+are NEW owned MIT implementations, not a Ghost file port. The exact source plan
+matrix marks HTTP as NEW. Documentation6169eb2/runtime146f733 and local plan/
+handoff retain their previously documented roles; PRD FR01/02/03/09/10 and
+ARB AR01/02/03/07/08 inform the scoped implementation. No source scripts, data,
+tenant demo manifest, schema catalog or domain APIs were copied. Unmodified
+contracts parsers/ports at the target base are reused as the sole runtime edge.
+Third-party fetch host implementations/Zod/tooling keep their independent terms.
+
+Existing contracts/core APIs/source/minor changesets and private feasibility
+apps/plugins/tests remain unchanged. Root gate/inventory/profile extensions and
+the exact source output ignores are necessary to validate the new publishable
+package, not wholesale graph weakening. See [HTTP source](source-http.md) and
+its package README for exact metadata wire shape and catalog limits. Source
+stays0.0.0; new minor changeset records future0.1.0 intent without versioning.
+No Ghost edits/adoption, registry publishing, PR/merge, logger/runtime fallback
+or .6-.9 implementation. No substantive source commit/push before Auditor.
+
+## MF loader stage (.6)
+
+Canonical armada-0wq76.6, gate `01a0f4f4-0bb0-7d74-bed2-626d41d2e4de`:
+exact integration base `542abb97894f118bc2c5e76fff1ae5f738a99fff`, logical `.3`
+prerequisite `424eff39c9dcc2388aae78c25fc51f63ff8f1eff`. Clean source-http
+invoked bd after parent verification to create exact
+`/home/sprawl/projects/pylons/worktrees/loader-mf`, `feature/pylons-loader-mf`;
+returned HEAD matched source remote. Shared target identity remains distinct from
+canonical Ghost, retaining the independently proved false-flag exception.
+
+Private checked-SDK/native-SRI/admission/export-guard patterns at that full target
+feasibility SHA informed new bounded public adapters without editing the private
+proof. Realm reservations/leases/maps and actual packed consumers are new owned
+MIT code. No Ghost federation file/React/global-alias/swallowed failure copied.
+See [loader evidence](loader-mf.md) for adaptation, verified-Blob native-SRI
+rationale, actual target-package choice and limits. SDK/runtime remain unmodified
+and separately licensed; prior source/APIs/Changesets/privacy/shutdown tests are
+preserved. Loader stays0.0.0 with additive initial minor intent. Independent audit
+precedes substantive commit/push; no registry/versioning/PR/merge/Ghost adoption
+or `.7–.9` implementation.

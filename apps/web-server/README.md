@@ -1,5 +1,9 @@
-# Reserved: web server
+# Private authoritative Bun server
 
-Future private authoritative host composition, verified request context and local
-provider invocation. No app implementation or manifest in .1. Future feasibility
-armada-0wq76.3 and demonstration armada-0wq76.7.
+Bearer credentials derive verified tenant before source/provider work. Actual public
+core/source/server-loader composes local providers; every guarded invocation reauthorizes.
+Bounded streamed JSON and fixed error boundaries do not echo documents/errors/headers.
+Native HTTP rejects browser bypass and foreign metadata. Private operator controls
+supervise the lab only; not a production authentication scheme or publishable server package.
+Original early HTTP boundary/entry remain in `tests/feasibility/apps/web-server`.
+See [runbook](../../docs/demo.md) for shutdown/drain and finite validity policy.

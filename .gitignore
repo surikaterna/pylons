@@ -10,5 +10,16 @@
 /worktrees/
 /node_modules/
 /.foundation-build/
+/packages/contracts/dist/
+/packages/contracts/node_modules/
+/packages/core/dist/
+/packages/core/node_modules/
+/packages/source-http/dist/
+/packages/source-http/node_modules/
 .env
 .env.*
+.feasibility-build/
+/.loader-build/
+/packages/loader-mf/dist/
+/packages/loader-mf/node_modules/
+.demo-build/

@@ -1,24 +1,32 @@
-# Pylons foundation
+# Pylons
 
-Private stage **armada-0wq76.1**, not an @pylons 0.1.0 runtime release.
-Only pinned tooling and attributed proposed specifications exist here. No contracts,
-core, transport, loader, executable plugins, browser or demo have been implemented.
+Portable, unpublished **0.0.0** contracts/core with independently installable HTTP
+metadata and Module Federation factory adapters. The private three-host/two-tenant
+demonstration composes those actual public APIs; it is not a bundled-plugin or RPC
+substitute. Independent integrated release-candidate audit remains a separate stage.
 
 Use `mise trust`, `mise install`, then `bun install --frozen-lockfile`.
-Run the real foundation gates described in [validation](docs/validation.md).
-[Provenance](docs/provenance.md) records source paths, revisions, transformations,
-license authority and setup exceptions. [Instructions](AGENTS.md) retain canonical
-Ghost Beads issue IDs; the target database only supports local worktree infrastructure.
+Run `bun run typecheck` before a first clean build (workspace declarations), then
+`bun run build` and `bun run demo -- --smoke` for a managed bounded smoke.
+`bun run demo` serves the browser fixture on loopback port4040 and prints the
+separate authoritative server URL. [Demo runbook](docs/demo.md) describes credentials,
+fixtures, CLI sessions, controls, finite grants and D01–D09 automation.
 
-Reserved directories contain responsibility READMEs, not dummy runtime packages.
-Future graph: contracts ← core; contracts ← independently installed HTTP source
-and MF loader; private host applications compose the chosen adapters.
-MF/slf feasibility, three-host/two-tenant execution, finite trust/validity policy,
-packed consumers and registry publication are **unproven future gates**.
+Gates: `bun run lint`, `bun run typecheck`, `bun run test`, `bun test`,
+`bun run build`, `bun run test:e2e`, `bun run verify:packages`,
+`bun run test:demo`, `bun run test:demo:e2e`, `bun run test:demo:ui`,
+`bun run test:demo:interactive`. Interactive demo supervision has no automatic
+server kill timeout; finite authorization deadlines are separate from its lifetime.
+Dedicated early feasibility/loader
+regressions remain independent, not final-demo substitutes.
 
-Proposals: [PRD](docs/architecture/plugin-runtime-0.1-prd.md),
-[ARB](docs/architecture/plugin-runtime-0.1-arb.md),
-[future discussion](docs/architecture/plugin-runtime-future-directions.md).
-They retain Ghost terminology and identifiers; transfer is not acceptance or adoption.
-Owner-approved source/new foundation license: [MIT](LICENSE),
-exact notice `Copyright (c) Surikaterna`. Third-party dependencies keep their own terms.
+[Contracts](docs/contracts.md), [core](docs/core.md), [HTTP source](docs/source-http.md),
+[loader](docs/loader-mf.md), [validation](docs/validation.md),
+[provenance](docs/provenance.md), [instructions](AGENTS.md).
+Canonical tracking remains in Ghost Beads; target Beads only wires worktrees.
+MIT [license](LICENSE), `Copyright (c) Surikaterna`; third-party terms retained.
+
+No registry publication/version application, PR/merge or Ghost adoption is claimed.
+Packed local consumer overrides are development evidence, not registry resolution.
+The existing initial MINOR changesets and independently verified core cancellation
+PATCH retain future0.1.0 intent; all public package versions remain0.0.0.

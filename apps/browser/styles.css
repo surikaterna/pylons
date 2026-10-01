@@ -1,0 +1,15 @@
+:root { color-scheme: light dark; --pylons-surface: Canvas; --pylons-text: CanvasText; --pylons-border: GrayText; --pylons-focus: Highlight; }
+body { margin: 0; background: var(--pylons-surface); color: var(--pylons-text); font-family: system-ui, sans-serif; }
+main { max-width: 48rem; padding: 1rem; margin: auto; }
+form { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+input, select, button { font: inherit; padding: .6rem; min-width: 0; background: var(--pylons-surface); color: var(--pylons-text); border: 1px solid var(--pylons-border); }
+:focus-visible { outline: 3px solid var(--pylons-focus); outline-offset: 2px; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+#lifecycle { overflow-wrap: anywhere; }
+.lifecycle-card { border: 1px solid var(--pylons-border); border-radius: .4rem; padding: .8rem; margin-block: .8rem; overflow-wrap: anywhere; }
+.lifecycle-card h4 { margin: 0; }
+summary { cursor: pointer; padding-block: .4rem; }
+dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: .4rem; }
+dt { font-weight: 600; }
+dd { margin: 0; }
+@media (min-width: 40rem) { form { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); } button { grid-column: 2; } }
