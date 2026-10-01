@@ -1,5 +1,6 @@
 import type { RuntimeSnapshot, RuntimeState } from "@pylons/contracts";
 import type { MetadataEntry } from "@pylons/core";
+import { safeId, safeSnapshot } from "../shared/diagnostic-view.js";
 
 export const stateExplanation: Readonly<Record<RuntimeState, string>> = {
   absent: "No applicable installation is present.",
@@ -31,13 +32,13 @@ export class LifecycleLabels {
     for (const entry of metadata) {
       this.labels.set(
         this.key(entry.pluginId, entry.definitionVersion),
-        entry.contributions.flatMap((item) => (item.provider ? [`${item.provider.capabilityId}@${item.provider.contractVersion}`] : [])),
+        entry.contributions.flatMap((item) => (item.provider ? [`${safeId(item.provider.capabilityId)}@${safeId(item.provider.contractVersion)}`] : [])),
       );
     }
     return snapshots.map((snapshot) => ({
-      snapshot,
+      snapshot: safeSnapshot(snapshot),
       capabilities: this.labels.get(this.key(snapshot.generation.definition.pluginId, snapshot.generation.definition.definitionVersion)),
-      appliedRevision: snapshot.generation.appliedRevision ?? "not applied",
+      appliedRevision: snapshot.generation.appliedRevision === undefined ? "not applied" : safeId(snapshot.generation.appliedRevision),
       explanation: stateExplanation[snapshot.state],
     }));
   }

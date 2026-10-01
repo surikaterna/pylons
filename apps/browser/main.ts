@@ -14,7 +14,7 @@ async function main(): Promise<void> {
   const discovered = await Promise.all([host.discover("a"), host.discover("b")]);
   if (host.closed) return;
   if (discovered.some((value) => !value.result.success)) throw new Error("metadata-failed");
-  host.policy.initialize(true);
+  host.initializeSecurity(true);
   await Promise.all([host.scoped("a").startup(), host.scoped("b").startup()]);
   document.getElementById("status")?.replaceChildren("Metadata ready; providers remain lazy.");
 }

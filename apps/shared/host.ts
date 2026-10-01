@@ -2,10 +2,12 @@ import type { ArtifactLoader, Host, LifecycleEvent, Result } from "@pylons/contr
 import { createRuntime, createVersionOwnership, type Runtime } from "@pylons/core";
 import { authenticate, SecurityPolicy } from "./authority.js";
 import type { Artifact } from "./definitions.js";
+import { diagnosticView } from "./diagnostic-view.js";
 import { DemoError, document, object, reference, security, type Tenant, tenants, validation, validResult } from "./domain.js";
 import { HostClock, Signal } from "./lifetime.js";
 import { diagnostics, loggingReport } from "./logging.js";
 import { metadataPorts } from "./source.js";
+import { observedPorts, type SourceOutcome } from "./source-outcomes.js";
 import type { RemoteEvent } from "./trace-contract.js";
 
 export class DemoHost {
@@ -14,6 +16,8 @@ export class DemoHost {
   private readonly ownership = createVersionOwnership();
   private readonly runtimes = new Map<Tenant, Runtime>();
   private readonly events: { host: Host; event: LifecycleEvent; at: number }[] = [];
+  private readonly sourceOutcomes: SourceOutcome[] = [];
+  private readonly changed = new Set<() => void>();
   private readonly remote: (RemoteEvent & { readonly host: Host; readonly order: number; readonly at: number })[] = [];
   private closing = false;
   private readonly disposers: (() => void)[] = [];
@@ -47,11 +51,15 @@ export class DemoHost {
   }
   private runtime(scope: Tenant): Runtime {
     const ports = metadataPorts(this.origin, this.host, scope, this.clock);
+    const observed = observedPorts(ports, scope, this.clock, (outcome) => {
+      this.sourceOutcomes.push(outcome);
+      this.notify();
+    });
     return createRuntime({
       context: ports.context,
       host: this.host,
       hostContractVersion: "1",
-      source: ports.source,
+      source: observed.source,
       loader: this.loader,
       policy: {
         async evaluate(request) {
@@ -64,7 +72,7 @@ export class DemoHost {
       },
       authority: this.policy,
       clock: this.clock,
-      observer: { observe: (event) => this.events.push({ host: this.host, event, at: this.clock.now() }) },
+      observer: { observe: (event) => this.observe(event) },
       diagnostics,
       bounds: { source: 1500, policy: 1000, load: 1500, activation: 1500, invocation: 1000, replacement: 1000, cleanup: 1000 },
       supportedContributionKinds: ["demo:validation"],
@@ -98,7 +106,12 @@ export class DemoHost {
   async discover(scope: Tenant) {
     const runtime = this.scoped(scope);
     const result = await runtime.refresh();
-    const catalog = metadataPorts(this.origin, this.host, scope, this.clock).catalog;
+    if (!result.success) return { result, metadata: runtime.metadata(), catalog: [] };
+    const ports = metadataPorts(this.origin, this.host, scope, this.clock);
+    const { catalog } = observedPorts(ports, scope, this.clock, (outcome) => {
+      this.sourceOutcomes.push(outcome);
+      this.notify();
+    });
     const catalogResults = await Promise.all(runtime.metadata().map((entry) => catalog.read(entry, new Signal())));
     return { result, metadata: runtime.metadata(), catalog: catalogResults.map((entry) => entry.success) };
   }
@@ -115,6 +128,32 @@ export class DemoHost {
     const results = await Promise.all(capabilities.map((capability) => runtime.invoke(capability, input, this.policy.request(credential))));
     if (results.some((result) => !result.success)) return { code: 2, error: "invocation-failed" };
     return { code: results.every((result) => result.success && validResult(result.data)) ? 0 : 1 };
+  }
+  onDiagnostics(listener: () => void): { dispose(): void } {
+    this.changed.add(listener);
+    return {
+      dispose: () => {
+        this.changed.delete(listener);
+      },
+    };
+  }
+  private observe(event: LifecycleEvent): void {
+    this.events.push({ host: this.host, event, at: this.clock.now() });
+    if (event.kind === "provider-changed") this.notify();
+  }
+  private notify(): void {
+    if (this.closing) return;
+    for (const listener of this.changed) {
+      try {
+        listener();
+      } catch {
+        // Private observers cannot change authority or source port results.
+      }
+    }
+  }
+  initializeSecurity(ready: boolean): void {
+    this.policy.initialize(ready);
+    this.notify();
   }
   async pair(scope: Tenant) {
     const runtime = this.scoped(scope);
@@ -135,6 +174,7 @@ export class DemoHost {
       rootsCleaned: this.rootsCleaned,
       snapshots: Object.fromEntries(tenants.map((scope) => [scope, this.scoped(scope).snapshots()])),
       events: [...this.events],
+      sourceOutcomes: [...this.sourceOutcomes],
       remote: [...this.remote],
       logging: loggingReport(),
     };
@@ -160,12 +200,12 @@ export class DemoHost {
   }
   async command(value: unknown): Promise<unknown> {
     if (!object(value)) return { error: "input-failed" };
-    if (this.closing && value.op !== "report" && value.op !== "shutdown" && value.op !== "exit") return { error: "closed" };
+    if (this.closing && value.op !== "report" && value.op !== "diagnostics" && value.op !== "shutdown" && value.op !== "exit") return { error: "closed" };
     const scope = value.tenant === "b" ? "b" : "a";
     if (value.op === "discover") return this.discover(scope);
     if (value.op === "refresh") return this.scoped(scope).refresh();
     if (value.op === "security") {
-      this.policy.initialize(value.ready === true);
+      this.initializeSecurity(value.ready === true);
       return this.scoped(scope).startup();
     }
     if (value.op === "pair") return this.pair(scope);
@@ -176,6 +216,7 @@ export class DemoHost {
       return this.scoped(scope).invoke(validation, value.document, this.policy.request(credential));
     }
     if (value.op === "shutdown") return this.shutdown();
+    if (value.op === "diagnostics") return diagnosticView(this);
     return this.report();
   }
 }

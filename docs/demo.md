@@ -25,7 +25,8 @@ resources. Interactive supervision has NO automatic child kill deadline: the60s
 grant limits authorization, not process lifetime. E2E clients separately select an
 explicit bounded supervisor. Managed smoke performs finite work and shuts down
 explicitly; its regression has an external5s test deadline, not a managed-child TTL.
-If4040 is occupied, stop the other listener rather than silently switching.
+If4040 is occupied, leave the other listener untouched unless its owner authorizes
+stopping it. Automated checks use isolated loopback namespaces, not a port switch.
 Do not expose this synthetic loopback fixture to production/network users.
 
 ## Try the browser
@@ -39,7 +40,8 @@ Open the printed `/browser` URL while `bun run demo` is running:
 4. Refresh metadata to reread the selected tenant's inventory/configuration. This
    does not itself demand executable code or renew authorization.
 
-Plugin cards foreground actual plugin IDs and states for the selected tenant only.
+Plugin cards foreground actual plugin IDs and states for **All tenants (A + B)** by
+default. The native Lifecycle tenants filter can select the form tenant alone.
 Expand a card for definition version, extension, generation ID, host/tenant scope,
 and desired/applied revisions (`not applied` when absent). All retained generation
 snapshots are listed, without claiming any row is current. Capability names come
@@ -48,6 +50,16 @@ for that definition); unavailable metadata is explicitly labelled, not invented.
 Metadata declarations are not executable code or readiness. Demand loads code and
 activates scoped instances; blocked can also mean a real dependency block, not just
 lazy demand. No raw configuration or error payload is rendered.
+
+Discovery / source records actual typed plan/catalog outcomes with host completion
+timestamps for both scopes. An initial failure has a source row, not invented
+failed/absent plugin rows. `invalid-plan` alone cannot distinguish malformed from
+expired metadata: guidance says **invalid or expired**, restart the rebuilt fixture
+from this worktree and use its printed origin. Known authorization/unavailability/
+catalog failures retain their original safe codes, alongside generic core warnings.
+The timeline shows the last40 observed public lifecycle state/provider changes in
+capture order, with actual generation IDs. This is a UI window, not host history
+deletion or a current-selection claim. Host security is labelled host-provided.
 
 The native labelled form selects tenant/session, title/reference and validates locally.
 Keyboard Tab/Home/End/Enter works at320/1280px; semantic
@@ -79,6 +91,23 @@ bun run demo:cli -- "$ORIGIN" invalid-token tests/demo/documents/short.json # ex
 ```
 
 CLI exits0 valid,1 invalid,2 input/authentication/infrastructure/cleanup failure.
+One-shot hosts always print per-plugin lifecycle summaries to stderr before/after
+shutdown. Add `--diagnostics` anywhere in the argument list for detailed safe
+source outcomes/event history/declared capabilities, including with `--session`:
+
+```sh
+bun run demo:cli -- --diagnostics "$ORIGIN" b-alice tests/demo/documents/long.json
+```
+
+Validation/discovery stdout still contains exactly one result. Input/authentication
+rejection before host creation retains its original stderr-only exit2 behavior.
+Failed initial discovery stops
+before demand with `{"code":2,"error":"discovery-failed"}` and actionable stderr
+guidance. It does not fetch executable code, renew authority, or discover a foreign
+tenant just for diagnostics. Session `{"id":10,"op":"diagnostics"}` returns a
+small safe projection; the advanced internal `report` also contains test logging
+and remote traces and is not the browser/CLI diagnostics display. Session ready and
+ID replies are unchanged; summaries are emitted at owned shutdown, not late events.
 One-shot subprocesses are separate generations, NOT warm reuse evidence. In one
 session, start:
 
@@ -117,6 +146,9 @@ Managed demo grants expire after **60 seconds**. Restart `bun run demo` for fres
 grants if testing takes longer. Browser Refresh metadata, a new CLI process, or
 rediscovery alone cannot renew the fixture authority deadline. Config/operator
 controls below are optional advanced tests, not prerequisites for this walkthrough.
+Rebuild and restart from the new worktree to see updated UI/CLI diagnostics; an
+already-running older demo retains its old compiled source and original deadlines.
+No optional TTL extension or automatic renewal is included.
 
 ## Real APIs and authority
 

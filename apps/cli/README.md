@@ -25,3 +25,24 @@ next. Dispatch is concurrent, not paste-order serialized. Follow the exact
 Session `response.code` is a request result, not process exit status. Ctrl+D on an
 empty line after the shutdown reply closes stdin. Restart the managed demo after
 its60s grants expire; rediscovery alone does not renew authority.
+
+After host creation, one-shot prints concise per-plugin lifecycle summaries to **stderr**, labelled
+before and after owned shutdown. Only the authenticated tenant is discovered; an
+A invocation does not fetch B metadata just for diagnostics. Add `--diagnostics`
+anywhere among arguments for declared capabilities, extensions, actual event history
+and source outcomes, e.g.:
+
+```sh
+bun run demo:cli -- --diagnostics "$ORIGIN" b-alice tests/demo/documents/long.json
+bun run demo:cli -- "$ORIGIN" --session --diagnostics
+```
+
+Stdout remains machine-readable: validation/discovery has one JSON result; session retains the
+ready line and ID-tagged replies. In session, `{"id":10,"op":"diagnostics"}` returns
+the small safe projection, unlike the advanced internal test report. Detailed
+stderr is emitted at session shutdown, not asynchronously between replies.
+Failed discovery stops before demand, returns `{"code":2,"error":"discovery-failed"}`
+and prints actionable source guidance. `invalid-plan` is invalid-or-expired, not a
+claim of confirmed expiry. Restart a rebuilt demo from this worktree for new60s
+fixture grants; use its printed fixture origin. New source does not update an
+already-running older demo. No grant extension or automatic renewal is performed.

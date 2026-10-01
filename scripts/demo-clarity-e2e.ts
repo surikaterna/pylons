@@ -1,6 +1,6 @@
 import type { Page } from "playwright-core";
 import { startFixture } from "../apps/fixture-server/main.js";
-import { check, count, get, snapshots, waitFor } from "./demo-assert.js";
+import { check, count, get, list, snapshots, waitFor } from "./demo-assert.js";
 import { type Client, client } from "./demo-client.js";
 
 type Fixture = Awaited<ReturnType<typeof startFixture>>;
@@ -33,9 +33,12 @@ async function matchesReport(page: Page, consumer: Client, scope: string): Promi
 }
 
 async function initial(page: Page, consumer: Client, fixture: Fixture): Promise<void> {
+  check((await page.locator("#lifecycle article").count()) === 3, "clarity-default-all-tenants");
+  await page.locator("#lifecycle-filter").selectOption("selected");
   await matchesReport(page, consumer, "a");
+  await timeline(page, consumer, "a");
   const titles = await page.locator("#lifecycle h4").allTextContents();
-  check(titles.join() === "basic-validation · blocked", "clarity-initial-A");
+  check(titles.join() === "A · basic-validation · blocked", "clarity-initial-A");
   check((await page.locator("#lifecycle").textContent())?.includes("validation@1"), "clarity-real-contribution-label");
   await page.locator("#tenant").selectOption("b");
   await matchesReport(page, consumer, "b");
@@ -69,6 +72,9 @@ async function transitions(page: Page, consumer: Client, fixture: Fixture): Prom
   await matchesReport(page, consumer, "a");
   await consumer.command({ op: "validate", token: "a-bob", document: { title: "four" } });
   check(count(await consumer.command({ op: "report" }), "activation", "basic-validation", "a") === 1, "clarity-warm-no-reactivation");
+  await timeline(page, consumer, "a");
+  const history = await page.locator("#lifecycle-timeline").textContent();
+  check(history?.includes("loading") && history.includes("activating") && history.includes("ready=true"), "diagnostics-real-state-provider-history");
 }
 
 async function revisions(page: Page, consumer: Client, fixture: Fixture): Promise<void> {
@@ -87,16 +93,55 @@ async function revisions(page: Page, consumer: Client, fixture: Fixture): Promis
   await consumer.command({ op: "validate", token: "b-alice", document: { title: "A long document title", reference: "REF-1" } });
   await matchesReport(page, consumer, "b");
   check((await page.locator("#lifecycle article").count()) > 2, "clarity-history-not-collapsed");
+  await timeline(page, consumer, "b");
+  await page.locator("#lifecycle-filter").selectOption("all");
+  const proof = await consumer.command({ op: "report" });
+  check(
+    (await page.locator("#lifecycle article").count()) === snapshots(proof, "a").length + snapshots(proof, "b").length,
+    "diagnostics-all-retained-both-scopes",
+  );
+  await page.locator("#lifecycle-filter").selectOption("selected");
+}
+
+async function timeline(page: Page, consumer: Client, scope: string): Promise<void> {
+  const view = await consumer.command({ op: "diagnostics" });
+  const expected = list(get(view, "events"))
+    .filter((entry) => {
+      const event = get(entry, "event");
+      const generation = get(event, "kind") === "state-changed" ? get(get(event, "snapshot"), "generation") : get(event, "generation");
+      return get(get(generation, "scope"), "tenantId") === scope;
+    })
+    .slice(-40)
+    .map((entry) => {
+      const event = get(entry, "event");
+      const snapshot = get(event, "snapshot");
+      const generation = get(event, "kind") === "state-changed" ? get(snapshot, "generation") : get(event, "generation");
+      const capability = get(event, "capability");
+      const detail =
+        get(event, "kind") === "state-changed"
+          ? `${get(snapshot, "state")}${get(snapshot, "failureCode") ? ` / ${get(snapshot, "failureCode")}` : ""}`
+          : `${get(capability, "capabilityId")}@${get(capability, "contractVersion")} ready=${get(event, "ready")}`;
+      const at = get(entry, "at");
+      check(typeof at === "number", "diagnostics-actual-host-event-timestamp");
+      return `${new Date(at).toISOString()} ${scope} ${get(get(generation, "definition"), "pluginId")} ${get(generation, "generationId")} ${get(event, "kind")} ${detail}`;
+    });
+  check(JSON.stringify(await page.locator("#lifecycle-timeline li").allTextContents()) === JSON.stringify(expected), "diagnostics-exact-capture-order-window");
+  check((await page.locator("#lifecycle").textContent())?.includes("Host-provided security capability: ready"), "diagnostics-security-change-visible");
 }
 
 async function keyboard(page: Page): Promise<void> {
   for (const width of [320, 1280]) {
     await page.setViewportSize({ width, height: 800 });
+    await page.locator("#lifecycle-filter").focus();
+    await page.keyboard.press("Home");
+    check((await page.locator("#lifecycle h3").first().textContent())?.includes("Tenant A + B"), "diagnostics-keyboard-all-filter");
+    await page.keyboard.press("End");
+    check((await page.locator("#lifecycle h3").first().textContent())?.includes("Tenant B"), "diagnostics-keyboard-selected-filter");
     await page.locator("#tenant").focus();
     await page.keyboard.press("Home");
-    check((await page.locator("#lifecycle h3").textContent())?.includes("Tenant A"), "clarity-keyboard-A");
+    check((await page.locator("#lifecycle h3").first().textContent())?.includes("Tenant A"), "clarity-keyboard-A");
     await page.keyboard.press("End");
-    check((await page.locator("#lifecycle h3").textContent())?.includes("Tenant B"), "clarity-keyboard-B");
+    check((await page.locator("#lifecycle h3").first().textContent())?.includes("Tenant B"), "clarity-keyboard-B");
     await page.locator("#lifecycle summary").first().focus();
     await page.keyboard.press("Enter");
     check((await page.locator("#lifecycle details").first().getAttribute("open")) !== null, "clarity-keyboard-details");

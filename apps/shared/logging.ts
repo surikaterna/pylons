@@ -34,7 +34,6 @@ export function bindLogging(): void {
     next(null, event);
   });
   LoggerFactory.getLogger("pylons:demo-host").debug("demo bootstrap");
-  diagnostics.write({ level: "warn", code: "plan-invalid", correlation: "SECRET_CONFIG_DOCUMENT_HEADER_ERROR_SENTINEL" });
   capture.queued = JSON.stringify(globalThis.__slf._queued);
   const imported: unknown = slfDebug;
   const actual = object(imported) ? imported.default : imported;
@@ -49,4 +48,9 @@ export function bindLogging(): void {
 }
 export function loggingReport() {
   return { ...capture, middleware: [...capture.middleware], backend: [...capture.backend] };
+}
+// Explicit test seam, never injected into an operational host's bootstrap.
+export function loggingPrivacyProbe(): void {
+  diagnostics.write({ level: "warn", code: "plan-invalid", correlation: "SECRET_CONFIG_DOCUMENT_HEADER_ERROR_SENTINEL" });
+  if (!bound) capture.queued = JSON.stringify(globalThis.__slf._queued);
 }

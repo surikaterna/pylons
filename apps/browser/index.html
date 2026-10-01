@@ -11,4 +11,5 @@
 <p>Metadata describes plugins and declared capabilities without downloading executable code. Validation demands code, then initializes tenant-scoped instances. A state of blocked is not necessarily lazy loading: dependencies can also block execution.</p>
 <p>Tenant A: basic-validation, minimum 3 title characters. Tenant B: basic-validation, minimum 8, plus reference-required. The credential-policy capability belongs to the host; it is not a third remote plugin.</p>
 <p>Try title “four”: A is valid, B is invalid. Load the long document fixture for a valid B example, then clear its reference to make B invalid. Refresh metadata does not renew authorization; restart the demo for fresh 60-second grants.</p>
+<label for="lifecycle-filter">Lifecycle tenants</label><select id="lifecycle-filter"><option value="all">All tenants (A + B)</option><option value="selected">Selected form tenant</option></select>
 <div id="lifecycle"></div></section></main><script src="/host/browser.js"></script></body></html>

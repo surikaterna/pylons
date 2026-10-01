@@ -39,6 +39,9 @@ export function attachView(host: DemoHost): void {
     host.own(() => subscription.dispose());
   }
   document.getElementById("tenant")?.addEventListener("change", () => lifecycle.render(host, form), options);
+  document.getElementById("lifecycle-filter")?.addEventListener("change", () => lifecycle.render(host, form), options);
+  const subscription = host.onDiagnostics(() => lifecycle.render(host, form));
+  host.own(() => subscription.dispose());
   lifecycle.render(host, form);
   attachShutdown(host, options);
 }

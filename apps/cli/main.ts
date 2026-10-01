@@ -3,6 +3,7 @@ import { serverHost } from "../shared/bootstrap-server.js";
 import { document, object } from "../shared/domain.js";
 import type { DemoHost } from "../shared/host.js";
 import { bindLogging } from "../shared/logging.js";
+import { printDiagnostics } from "./diagnostics.js";
 
 async function session(host: DemoHost): Promise<void> {
   let buffer = "";
@@ -44,12 +45,14 @@ async function command(host: DemoHost, line: string): Promise<void> {
 }
 async function main(): Promise<void> {
   bindLogging();
-  const origin = process.argv[2];
+  const args = process.argv.slice(2).filter((entry) => entry !== "--diagnostics");
+  const detailed = process.argv.includes("--diagnostics");
+  const origin = args[0];
   if (!origin) throw new Error("input-failed");
-  const interactive = process.argv[3] === "--session";
-  const credential = interactive ? undefined : authenticate(process.argv[3]);
+  const interactive = args[1] === "--session";
+  const credential = interactive ? undefined : authenticate(args[1]);
   if (!interactive && !credential) throw new Error("auth-failed");
-  const input: unknown = interactive ? null : JSON.parse(await Bun.file(process.argv[4] ?? "").text());
+  const input: unknown = interactive ? null : JSON.parse(await Bun.file(args[2] ?? "").text());
   if (!interactive && !document(input)) throw new Error("input-failed");
   const host = await serverHost(origin, "cli");
   try {
@@ -59,14 +62,22 @@ async function main(): Promise<void> {
       return;
     }
     if (!credential) throw new Error("auth-failed");
-    await host.discover(credential.tenant);
-    host.policy.initialize(true);
+    const discovery = await host.discover(credential.tenant);
+    if (!discovery.result.success || discovery.catalog.some((entry) => !entry)) {
+      console.log(JSON.stringify({ code: 2, error: "discovery-failed" }));
+      process.exitCode = 2;
+      printDiagnostics(host, detailed, "discovery failed; before shutdown");
+      return;
+    }
+    host.initializeSecurity(true);
     await host.scoped(credential.tenant).startup();
-    const result = await host.validate(process.argv[3], input);
+    const result = await host.validate(args[1], input);
     console.log(JSON.stringify(result));
     process.exitCode = result.code;
+    printDiagnostics(host, detailed, "before shutdown");
   } finally {
     const stopped = await host.shutdown();
+    printDiagnostics(host, detailed, "after shutdown");
     if (stopped.results.some((result) => !result.success)) process.exitCode = 2;
   }
 }
