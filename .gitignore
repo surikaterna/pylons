@@ -12,6 +12,8 @@
 /.foundation-build/
 /packages/contracts/dist/
 /packages/contracts/node_modules/
+/packages/core/dist/
+/packages/core/node_modules/
 .env
 .env.*
 .feasibility-build/

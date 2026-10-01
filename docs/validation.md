@@ -1,5 +1,13 @@
 # Tooling and contracts validation (.2)
 
+The .4 extension is documented in [core](core.md): root lint/typecheck/test/build
+and package verification include the new core and its own exact closure profile.
+Public inventory is now contracts/core only; six root/private harness manifests
+remain. Existing contracts-only consumer/profile and all private feasibility gates
+remain in place. Core compiled consumers additionally install actual sibling tarballs
+through a local consumer-only override, not a runtime manifest link or registry claim.
+The historical .2/.3 descriptions below retain their original stage scope/counts.
+
 The private .3 extension is documented in [feasibility](feasibility.md). Root
 build/test:e2e now aggregate its real MF/three-host gates, lint/typecheck include
 all private source, and unit discovery includes tests/feasibility. Exact private

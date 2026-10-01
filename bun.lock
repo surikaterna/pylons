@@ -11,6 +11,7 @@
         "@module-federation/runtime": "2.9.0",
         "@module-federation/sdk": "2.9.0",
         "@pylons/contracts": "workspace:*",
+        "@pylons/core": "workspace:*",
         "@types/bun": "1.4.0",
         "@types/debug": "4.1.12",
         "debug": "4.4.3",
@@ -38,6 +39,13 @@
       "version": "0.0.0",
       "dependencies": {
         "zod": "3.25.76",
+      },
+    },
+    "packages/core": {
+      "name": "@pylons/core",
+      "version": "0.0.0",
+      "dependencies": {
+        "@pylons/contracts": "0.0.0",
       },
     },
     "plugins/basic-validation": {
@@ -160,6 +168,8 @@
     "@nodelib/fs.walk": ["@nodelib/fs.walk@1.2.8", "", { "dependencies": { "@nodelib/fs.scandir": "2.1.5", "fastq": "^1.6.0" } }, "sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg=="],
 
     "@pylons/contracts": ["@pylons/contracts@workspace:packages/contracts"],
+
+    "@pylons/core": ["@pylons/core@workspace:packages/core"],
 
     "@rspack/binding": ["@rspack/binding@2.2.8", "", { "optionalDependencies": { "@rspack/binding-darwin-arm64": "2.2.8", "@rspack/binding-darwin-x64": "2.2.8", "@rspack/binding-linux-arm64-gnu": "2.2.8", "@rspack/binding-linux-arm64-musl": "2.2.8", "@rspack/binding-linux-ppc64-gnu": "2.2.8", "@rspack/binding-linux-riscv64-gnu": "2.2.8", "@rspack/binding-linux-riscv64-musl": "2.2.8", "@rspack/binding-linux-s390x-gnu": "2.2.8", "@rspack/binding-linux-x64-gnu": "2.2.8", "@rspack/binding-linux-x64-musl": "2.2.8", "@rspack/binding-wasm32-wasi": "2.2.8", "@rspack/binding-win32-arm64-msvc": "2.2.8", "@rspack/binding-win32-ia32-msvc": "2.2.8", "@rspack/binding-win32-x64-msvc": "2.2.8" } }, "sha512-c9flkSua3khHnOKBCRk8BkHGOwU9YB7niv+5JfQXiLZIvJmgKsZ7PD8QrFklMhsJT3oVAc6c9GN7/wy1YkACjA=="],
 

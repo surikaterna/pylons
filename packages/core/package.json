@@ -1,0 +1,11 @@
+{
+  "name": "@pylons/core",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Scoped neutral lifecycle coordination for Pylons",
+  "license": "MIT",
+  "sideEffects": false,
+  "files": ["dist", "README.md", "LICENSE"],
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "dependencies": { "@pylons/contracts": "0.0.0" }
+}

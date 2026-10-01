@@ -135,3 +135,22 @@ No third-party source patches, public adapter package, registry operation, Ghost
 edit/adoption, PR/merge or .4-.9 implementation. See feasibility.md for actual
 versions, generated targets/hashes, validation boundaries and logger quirks.
 Independent audit still precedes substantive source commit/push.
+
+## Neutral core stage (.4)
+
+Canonical armada-0wq76.4, Builder gate `01a0f482-f9e2-7f0c-a19e-f0b6cdad0173`:
+.2 verified/pushed `473c9cc8285e826014811727cfc021c0eec955d9` and broad migration
+gate .3 verified/pushed `424eff39c9dcc2388aae78c25fc51f63ff8f1eff`. From that clean
+feasibility worktree, bd created `/home/sprawl/projects/pylons/worktrees/core`,
+branch `feature/pylons-core`; exact HEAD matched `git ls-remote` for feasibility.
+Shared target Beads/database/project/common-Git identities match root and differ
+from Ghost, retaining the approved bd1.2.2 false-flag exception.
+
+New core, tests and packaging extensions retain owner-approved MIT. See
+[core](core.md) for exact source paths/full SHAs, selective conceptual adaptations,
+characterization divergences, API choices and limits. Existing contracts source,
+manifest/minor changeset and private feasibility source/tests are unchanged. Root
+gates include the new exact public package/profile; no blanket closure weakening.
+No Ghost edits/adoption, HTTP/MF productization, logger replacement, registry
+publication, versioning, PR/merge or later issue implementation. No substantive
+source commit/push before exact independent Auditor approval.
