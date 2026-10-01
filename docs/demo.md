@@ -28,9 +28,29 @@ explicitly; its regression has an external5s test deadline, not a managed-child 
 If4040 is occupied, stop the other listener rather than silently switching.
 Do not expose this synthetic loopback fixture to production/network users.
 
-The native labelled form selects tenant/session, title/reference, validates locally,
-fetches a long document fixture locally, refreshes metadata and displays lifecycle
-desired/applied revisions. Keyboard Tab/Home/End/Enter works at320/1280px; semantic
+## Try the browser
+
+Open the printed `/browser` URL while `bun run demo` is running:
+
+1. Select Tenant A, leave Alice selected, enter title `four`, and validate: **Valid**.
+2. Select Tenant B and validate the same title: **Invalid** (minimum8 and reference required).
+3. Load the long document fixture and validate B: **Valid**. Clear Reference and
+   validate again: **Invalid**.
+4. Refresh metadata to reread the selected tenant's inventory/configuration. This
+   does not itself demand executable code or renew authorization.
+
+Plugin cards foreground actual plugin IDs and states for the selected tenant only.
+Expand a card for definition version, extension, generation ID, host/tenant scope,
+and desired/applied revisions (`not applied` when absent). All retained generation
+snapshots are listed, without claiming any row is current. Capability names come
+from matching runtime contribution metadata (previously observed labels are retained
+for that definition); unavailable metadata is explicitly labelled, not invented.
+Metadata declarations are not executable code or readiness. Demand loads code and
+activates scoped instances; blocked can also mean a real dependency block, not just
+lazy demand. No raw configuration or error payload is rendered.
+
+The native labelled form selects tenant/session, title/reference and validates locally.
+Keyboard Tab/Home/End/Enter works at320/1280px; semantic
 Pylons CSS system-color tokens support light/dark schemes, no Ghost token adoption.
 Document HTTP/network/non-200/malformed failures show only the fixed live status
 `Document fixture unavailable.`; no raw error or unhandled rejection is published.
@@ -38,32 +58,65 @@ Per-view requests own cancellation, cancel superseded fetches and abort at shutd
 Late/stale responses cannot change form fields, status or lifecycle DOM even when
 a collaborator ignores cancellation. Other awaited UI results also check closure.
 
-With the printed origin (replace `$ORIGIN`), a plain Bun one-shot CLI:
+## Test the CLI in a second terminal
+
+First complete the build above and keep `bun run demo` running in terminal1.
+In terminal2, from the repository root, use its printed **cliOrigin** fixture URL,
+NOT the ephemeral authoritative server URL. Typically:
 
 ```sh
-bun run demo:cli -- "$ORIGIN" a-alice tests/demo/documents/short.json
-bun run demo:cli -- "$ORIGIN" b-alice tests/demo/documents/long.json
-bun run demo:cli -- "$ORIGIN" b-alice tests/demo/documents/short.json
-bun run demo:cli -- "$ORIGIN" --session
+ORIGIN=http://127.0.0.1:4040
+```
+
+Run each one-shot command separately; check `$?` immediately after each. Expected
+process exit codes are shown in the comments (invalid/auth-failure are intentional):
+
+```sh
+bun run demo:cli -- "$ORIGIN" a-alice tests/demo/documents/short.json # valid, exit 0
+bun run demo:cli -- "$ORIGIN" b-alice tests/demo/documents/long.json # valid, exit 0
+bun run demo:cli -- "$ORIGIN" b-alice tests/demo/documents/short.json # invalid, exit 1
+bun run demo:cli -- "$ORIGIN" invalid-token tests/demo/documents/short.json # exit 2
 ```
 
 CLI exits0 valid,1 invalid,2 input/authentication/infrastructure/cleanup failure.
 One-shot subprocesses are separate generations, NOT warm reuse evidence. In one
-session, send newline-delimited JSON (numeric request ID permits concurrent replies):
+session, start:
+
+```sh
+bun run demo:cli -- "$ORIGIN" --session
+```
+
+Wait for `{"ready":true}`. Then enter **ONE JSON line at a time**, press Enter, and
+wait for the reply with that ID before entering the next line below. Do not paste
+the whole block expecting ordered execution: commands are dispatched concurrently
+and replies may arrive out of order. `security` initializes the host credential policy,
+not a third remote plugin. The first report shows metadata with no provider evaluation;
+the last report shows reused instances and actual generation/revision/state fields.
 
 ```json
 {"id":1,"op":"discover","tenant":"a"}
 {"id":2,"op":"discover","tenant":"b"}
 {"id":3,"op":"security","ready":true}
-{"id":4,"op":"validate","token":"a-alice","document":{"title":"four"}}
-{"id":5,"op":"validate","token":"b-bob","document":{"title":"A long document title","reference":"REF-1"}}
-{"id":6,"op":"report"}
-{"id":7,"op":"shutdown"}
+{"id":4,"op":"report"}
+{"id":5,"op":"validate","token":"a-alice","document":{"title":"four"}}
+{"id":6,"op":"validate","token":"b-alice","document":{"title":"four"}}
+{"id":7,"op":"validate","token":"b-bob","document":{"title":"A long document title","reference":"REF-1"}}
+{"id":8,"op":"report"}
+{"id":9,"op":"shutdown"}
 ```
 
-Close stdin after shutdown to drain replies/close the CLI transport. No forced kill
+Validation replies for IDs5/6/7 contain `response.code`0/1/0 respectively. These are
+per-request result codes, NOT the session process exit status. After the shutdown
+reply, press **Ctrl+D** on an empty line to close stdin and exit the transport; a
+clean session normally exits0 even if a validation reply was invalid. Cleanup or
+infrastructure failure can make the process exit2. No forced kill
 on passing cases. Same-process repeat/concurrent requests reuse factories but own
 separate mutable scope instances and fresh principal/reference/transaction/cancellation.
+
+Managed demo grants expire after **60 seconds**. Restart `bun run demo` for fresh
+grants if testing takes longer. Browser Refresh metadata, a new CLI process, or
+rediscovery alone cannot renew the fixture authority deadline. Config/operator
+controls below are optional advanced tests, not prerequisites for this walkthrough.
 
 ## Real APIs and authority
 

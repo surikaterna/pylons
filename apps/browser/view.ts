@@ -1,6 +1,7 @@
 import { DemoError, tenant, document as validDocument } from "../shared/domain.js";
 import type { DemoHost } from "../shared/host.js";
 import { diagnostics } from "../shared/logging.js";
+import { LifecycleView } from "./lifecycle-view.js";
 import { ViewRequests } from "./view-requests.js";
 
 export function attachView(host: DemoHost): void {
@@ -9,12 +10,13 @@ export function attachView(host: DemoHost): void {
   const controller = new AbortController();
   host.own(() => controller.abort());
   const requests = new ViewRequests(host);
+  const lifecycle = new LifecycleView();
   const options = { signal: controller.signal };
   form.addEventListener(
     "submit",
     (event) => {
       event.preventDefault();
-      void validate(host, form);
+      void validate(host, form, lifecycle);
     },
     options,
   );
@@ -28,14 +30,19 @@ export function attachView(host: DemoHost): void {
   document.getElementById("refresh")?.addEventListener(
     "click",
     () => {
-      void refresh(host, form);
+      void refresh(host, form, lifecycle);
     },
     options,
   );
   for (const scope of ["a", "b"] satisfies readonly ("a" | "b")[]) {
-    const subscription = host.scoped(scope).onState(() => showState(host));
+    const subscription = host.scoped(scope).onState(() => lifecycle.render(host, form));
     host.own(() => subscription.dispose());
   }
+  document.getElementById("tenant")?.addEventListener("change", () => lifecycle.render(host, form), options);
+  lifecycle.render(host, form);
+  attachShutdown(host, options);
+}
+function attachShutdown(host: DemoHost, options: { readonly signal: AbortSignal }): void {
   document.getElementById("shutdown")?.addEventListener(
     "click",
     () => {
@@ -45,7 +52,7 @@ export function attachView(host: DemoHost): void {
     options,
   );
 }
-async function validate(host: DemoHost, form: HTMLFormElement): Promise<void> {
+async function validate(host: DemoHost, form: HTMLFormElement, lifecycle: LifecycleView): Promise<void> {
   if (host.closed) return;
   status(host, "Validating locally");
   const data = new FormData(form);
@@ -55,7 +62,7 @@ async function validate(host: DemoHost, form: HTMLFormElement): Promise<void> {
   try {
     const result = await host.validate(`${scope}-${user}`, { title: String(data.get("title") ?? ""), reference: String(data.get("reference") ?? "") });
     status(host, result.code === 0 ? "Valid" : result.code === 1 ? "Invalid" : "Infrastructure or authorization failed");
-    showState(host);
+    lifecycle.render(host, form);
   } catch {
     status(host, "Infrastructure or authorization failed");
   }
@@ -81,19 +88,15 @@ async function loadFixture(host: DemoHost, form: HTMLFormElement, requests: View
     requests.finish(request);
   }
 }
-async function refresh(host: DemoHost, form: HTMLFormElement): Promise<void> {
+async function refresh(host: DemoHost, form: HTMLFormElement, lifecycle: LifecycleView): Promise<void> {
   if (host.closed) return;
   const scope = new FormData(form).get("tenant");
   try {
     if (tenant(scope)) await host.scoped(scope).refresh();
-    showState(host);
+    lifecycle.render(host, form);
   } catch {
     status(host, "Metadata unavailable.");
   }
-}
-function showState(host: DemoHost): void {
-  if (host.closed) return;
-  document.getElementById("lifecycle")?.replaceChildren(JSON.stringify(host.report().snapshots, null, 2));
 }
 function status(host: DemoHost, message: string): void {
   if (!host.closed) document.getElementById("status")?.replaceChildren(message);
