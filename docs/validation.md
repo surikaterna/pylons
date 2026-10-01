@@ -1,5 +1,13 @@
 # Tooling and contracts validation (.2)
 
+The .6 extension is documented in [MF loader](loader-mf.md). Exact inventory is
+now four public/six private manifests. Root lint/typecheck/unit gates include all
+new loader source/tests/tooling; build adds `build:loader`, E2E adds
+`test:loader:e2e`, package verification adds actual packed browser/server installs,
+strict neutral selected declarations and real remote execution. Sibling profile
+restrictions and private .3 proofs remain unchanged. Historical counts below
+remain historical rather than assertions about the current inventory.
+
 The .5 extension is documented in [HTTP source](source-http.md). Current exact
 inventory is three public packages (contracts/core/source-http) and six private
 manifests. All root gates include source tests/build/compiled ESM verification;

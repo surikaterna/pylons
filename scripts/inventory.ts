@@ -1,9 +1,9 @@
 import { lstat, readdir, readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { validateContractsManifest, validateCoreManifest, validateSourceManifest } from "./package-policy.js";
+import { validateContractsManifest, validateCoreManifest, validateLoaderManifest, validateSourceManifest } from "./package-policy.js";
 import { FoundationError, record, rejectRuntimeLinks, validateManifest } from "./policy.js";
 
-const excluded = new Set([".git", ".beads", "node_modules", "worktrees", ".foundation-build", ".feasibility-build"]);
+const excluded = new Set([".git", ".beads", "node_modules", "worktrees", ".foundation-build", ".feasibility-build", ".loader-build"]);
 const privateManifests = new Map([
   ["plugins/basic-validation", "pylons-private-basic-validation"],
   ["apps/web-server", "pylons-private-web-server"],
@@ -47,6 +47,7 @@ export async function verifyPackages(root: string): Promise<readonly string[]> {
     join(directory, "packages/contracts"),
     join(directory, "packages/core"),
     join(directory, "packages/source-http"),
+    join(directory, "packages/loader-mf"),
   ]);
   const rootManifest = join(directory, "package.json");
   for (const path of paths) {
@@ -56,6 +57,7 @@ export async function verifyPackages(root: string): Promise<readonly string[]> {
     else if (path === join(directory, "packages/contracts/package.json")) validateContractsManifest(value);
     else if (path === join(directory, "packages/core/package.json")) validateCoreManifest(value);
     else if (path === join(directory, "packages/source-http/package.json")) validateSourceManifest(value);
+    else if (path === join(directory, "packages/loader-mf/package.json")) validateLoaderManifest(value);
     else {
       const expected = [...privateManifests].find(([privateDirectory]) => path === join(directory, privateDirectory, "package.json"));
       if (!expected) throw new FoundationError("Unexpected package manifest outside approved contracts workspace");

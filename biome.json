@@ -1,6 +1,6 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
-  "files": { "includes": ["scripts/**/*.ts", "tests/**/*.ts", "packages/contracts/src/**/*.ts", "packages/contracts/test/**/*.ts", "packages/core/src/**/*.ts", "packages/core/test/**/*.ts", "packages/source-http/src/**/*.ts", "packages/source-http/test/**/*.ts"] },
+  "files": { "includes": ["scripts/**/*.ts", "tests/**/*.ts", "packages/contracts/src/**/*.ts", "packages/contracts/test/**/*.ts", "packages/core/src/**/*.ts", "packages/core/test/**/*.ts", "packages/source-http/src/**/*.ts", "packages/source-http/test/**/*.ts", "packages/loader-mf/src/**/*.ts", "packages/loader-mf/test/**/*.ts"] },
   "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 160 },
   "linter": { "enabled": true, "rules": { "recommended": true } },
   "assist": { "actions": { "source": { "organizeImports": "on" } } }

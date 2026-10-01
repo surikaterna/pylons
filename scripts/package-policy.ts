@@ -49,6 +49,26 @@ export function validateSourceManifest(value: unknown): void {
   if (!equal(value, sourceManifest)) throw new FoundationError("Source manifest must match approved neutral/fetch exports and exact dependency");
 }
 
+export const loaderManifest = {
+  name: "@pylons/loader-mf",
+  version: "0.0.0",
+  type: "module",
+  description: "Admitted bounded Module Federation factory loading for Pylons",
+  license: "MIT",
+  sideEffects: false,
+  files: ["dist", "README.md", "LICENSE"],
+  exports: {
+    "./browser": { types: "./dist/browser.d.ts", import: "./dist/browser.js" },
+    "./server": { types: "./dist/server.d.ts", import: "./dist/server.js" },
+  },
+  dependencies: { "@pylons/contracts": "0.0.0", "@module-federation/runtime": "2.9.0", "@module-federation/sdk": "2.9.0" },
+};
+
+export function validateLoaderManifest(value: unknown): void {
+  rejectRuntimeLinks(value);
+  if (!equal(value, loaderManifest)) throw new FoundationError("Loader manifest must match exact target exports and vendor pins");
+}
+
 function equal(left: unknown, right: unknown): boolean {
   if (left === right) return true;
   if (Array.isArray(left) && Array.isArray(right)) return left.length === right.length && left.every((value, index) => equal(value, right[index]));

@@ -188,3 +188,24 @@ its package README for exact metadata wire shape and catalog limits. Source
 stays0.0.0; new minor changeset records future0.1.0 intent without versioning.
 No Ghost edits/adoption, registry publishing, PR/merge, logger/runtime fallback
 or .6-.9 implementation. No substantive source commit/push before Auditor.
+
+## MF loader stage (.6)
+
+Canonical armada-0wq76.6, gate `01a0f4f4-0bb0-7d74-bed2-626d41d2e4de`:
+exact integration base `542abb97894f118bc2c5e76fff1ae5f738a99fff`, logical `.3`
+prerequisite `424eff39c9dcc2388aae78c25fc51f63ff8f1eff`. Clean source-http
+invoked bd after parent verification to create exact
+`/home/sprawl/projects/pylons/worktrees/loader-mf`, `feature/pylons-loader-mf`;
+returned HEAD matched source remote. Shared target identity remains distinct from
+canonical Ghost, retaining the independently proved false-flag exception.
+
+Private checked-SDK/native-SRI/admission/export-guard patterns at that full target
+feasibility SHA informed new bounded public adapters without editing the private
+proof. Realm reservations/leases/maps and actual packed consumers are new owned
+MIT code. No Ghost federation file/React/global-alias/swallowed failure copied.
+See [loader evidence](loader-mf.md) for adaptation, verified-Blob native-SRI
+rationale, actual target-package choice and limits. SDK/runtime remain unmodified
+and separately licensed; prior source/APIs/Changesets/privacy/shutdown tests are
+preserved. Loader stays0.0.0 with additive initial minor intent. Independent audit
+precedes substantive commit/push; no registry/versioning/PR/merge/Ghost adoption
+or `.7–.9` implementation.

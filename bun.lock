@@ -12,6 +12,7 @@
         "@module-federation/sdk": "2.9.0",
         "@pylons/contracts": "workspace:*",
         "@pylons/core": "workspace:*",
+        "@pylons/loader-mf": "workspace:*",
         "@pylons/source-http": "workspace:*",
         "@types/bun": "1.4.0",
         "@types/debug": "4.1.12",
@@ -46,6 +47,15 @@
       "name": "@pylons/core",
       "version": "0.0.0",
       "dependencies": {
+        "@pylons/contracts": "0.0.0",
+      },
+    },
+    "packages/loader-mf": {
+      "name": "@pylons/loader-mf",
+      "version": "0.0.0",
+      "dependencies": {
+        "@module-federation/runtime": "2.9.0",
+        "@module-federation/sdk": "2.9.0",
         "@pylons/contracts": "0.0.0",
       },
     },
@@ -178,6 +188,8 @@
     "@pylons/contracts": ["@pylons/contracts@workspace:packages/contracts"],
 
     "@pylons/core": ["@pylons/core@workspace:packages/core"],
+
+    "@pylons/loader-mf": ["@pylons/loader-mf@workspace:packages/loader-mf"],
 
     "@pylons/source-http": ["@pylons/source-http@workspace:packages/source-http"],
 
