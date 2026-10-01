@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": ".",
+    "outDir": ".foundation-build",
+    "declaration": true
+  },
+  "include": ["scripts/**/*.ts"]
+}
