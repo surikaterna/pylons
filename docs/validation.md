@@ -1,5 +1,10 @@
 # Tooling and contracts validation (.2)
 
+**Historical staged evidence:** the inventory/counts and pending-audit/no-PR
+restrictions below are stage-local, not current integrated status. The
+[2026-10-05 agent handoff](agent-handoff.md) gives the four-package source baseline,
+current draft PR stack, required root gates and historical independent audit evidence.
+
 The .6 extension is documented in [MF loader](loader-mf.md). Exact inventory is
 now four public/six private manifests. Root lint/typecheck/unit gates include all
 new loader source/tests/tooling; build adds `build:loader`, E2E adds
