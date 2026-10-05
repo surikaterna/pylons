@@ -3,7 +3,9 @@
 Portable, unpublished **0.0.0** contracts/core with independently installable HTTP
 metadata and Module Federation factory adapters. The private three-host/two-tenant
 demonstration composes those actual public APIs; it is not a bundled-plugin or RPC
-substitute. Independent integrated release-candidate audit remains a separate stage.
+substitute. The integrated source has independent local audit evidence; release
+acceptance remains separate. See the [agent handoff](docs/agent-handoff.md) for
+2026-10-05 source, draft PR stack, canonical tracking and permission boundaries.
 
 Use `mise trust`, `mise install`, then `bun install --frozen-lockfile`.
 Run `bun run typecheck` before a first clean build (workspace declarations), then
@@ -26,7 +28,8 @@ regressions remain independent, not final-demo substitutes.
 Canonical tracking remains in Ghost Beads; target Beads only wires worktrees.
 MIT [license](LICENSE), `Copyright (c) Surikaterna`; third-party terms retained.
 
-No registry publication/version application, PR/merge or Ghost adoption is claimed.
+Draft PRs #2 (foundation) and #1 (integrated shape) are open; no merge, registry
+publication/version application or Ghost adoption is claimed.
 Packed local consumer overrides are development evidence, not registry resolution.
 The existing initial MINOR changesets and independently verified core cancellation
 PATCH retain future0.1.0 intent; all public package versions remain0.0.0.

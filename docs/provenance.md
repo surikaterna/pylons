@@ -1,5 +1,11 @@
 # Foundation provenance
 
+**Historical stage record:** stage-local pending-audit/no-PR/empty-remote wording
+below describes its original time, not today's integrated source or permissions.
+The [2026-10-05 agent handoff](agent-handoff.md) records current audited source,
+draft PRs, default/seed branches and retained canonical tracking. All original
+source SHAs, proposal transformations/restoration hashes and stage facts remain.
+
 Canonical issue **armada-0wq76.1**; planning armada-9jpyz; epic armada-0wq76.
 This is the private foundation, not a runtime extraction/release or accepted architecture.
 The user approved public surikaterna/pylons, cloning/setup, pinned tooling installation,
@@ -59,7 +65,7 @@ tests, READMEs and this evidence are original foundation material, not runtime r
 
 ## Local bootstrap and isolation
 
-The initially empty public remote has no default branch or remote heads yet.
+At bootstrap, the initially empty public remote had no default branch or remote heads.
 bd 1.2.2 init automatically committed nonproduction infrastructure as
 `d34177ca331d3a077aedacedb45113aee307df0e`; the owner/Builder explicitly approved
 retaining that inspected seed as a setup exception after it was reported.

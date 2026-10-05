@@ -1,5 +1,10 @@
 # Three-host, two-tenant private showcase — armada-0wq76.7
 
+**Historical implementation-stage introduction below:** integrated `.8` audit and
+source delivery have since completed; draft PRs now exist, not a release or merge.
+See the [2026-10-05 agent handoff](agent-handoff.md) for the actual integrated
+40b2071 baseline, current status and permissions. The operator contract remains.
+
 Implementation candidate; independent integrated `.8` audit is required before
 source delivery. No registry/version/PR/merge/Ghost adoption. Base source is
 `9c1eb16d6f11361863ab1eaa2949fa23e74d0ab2`, plus verified armada-44vqo correction
